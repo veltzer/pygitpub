@@ -5,17 +5,28 @@ main entry point to the program
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
 
-from pygitpub.utils import get_logger
+from pygitpub.configs import ConfigGithub
+from pygitpub.utils import github_login
 from pygitpub.static import VERSION_STR
 
 
 @register_endpoint(
     description="Show workflow runs",
     configs=[
+        ConfigGithub,
     ],
 )
 def show_runs() -> None:
-    logger = get_logger()
+    g = github_login()
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        for workflow in repo.get_workflows():
+            for run in workflow.get_runs():
+                last_run = run
+                break
+            else:
+                continue
+            if last_run.conclusion != "success":
+                print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
 
 
 @register_main(
