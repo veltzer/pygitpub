@@ -34,46 +34,15 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">All configurations for pygitpub</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">from</span> <span class="nn">pytconf</span> <span class="kn">import</span> <span class="n">Config</span><span class="p">,</span> <span class="n">ParamCreator</span>
 
 
-<div class="viewcode-block" id="ConfigScan"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.configs.ConfigScan">[docs]</a><span class="k">class</span> <span class="nc">ConfigScan</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfigGithub"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.configs.ConfigGithub">[docs]</a><span class="k">class</span> <span class="nc">ConfigGithub</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parameters that control the scanning phase</span>
+<span class="sd">    Paramters for your github account</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">folder</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_existing_folder</span><span class="p">(</span>
-        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Which folder to work on?&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ConfigAlgo"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.configs.ConfigAlgo">[docs]</a><span class="k">class</span> <span class="nc">ConfigAlgo</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parameters at the core of the algorithm</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">digest</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_choice</span><span class="p">(</span>
-        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Which digest to use?&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sha256&quot;</span><span class="p">,</span>
-        <span class="n">choice_list</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">algorithms_available</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="n">encoding</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_str</span><span class="p">(</span>
-        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Which encoding to use?&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ConfigLMDB"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.configs.ConfigLMDB">[docs]</a><span class="k">class</span> <span class="nc">ConfigLMDB</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parameters that control working with LMDB (experts only)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">map_size</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_int</span><span class="p">(</span>
-        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Which size of mmap to use?&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="mi">1000000000000</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">buffers</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_bool</span><span class="p">(</span>
-        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Should we use buffers? (lmdb default is False)&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_str</span><span class="p">(</span>
+        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;What is your github username?&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

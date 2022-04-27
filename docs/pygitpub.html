@@ -41,47 +41,13 @@
 <span id="pygitpub-configs-module"></span><h2>pygitpub.configs module<a class="headerlink" href="#module-pygitpub.configs" title="Permalink to this headline">¶</a></h2>
 <p>All configurations for pygitpub</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigAlgo</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigAlgo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigAlgo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigGithub">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigGithub</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigGithub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigGithub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytconf.config.Config</span></code></p>
-<p>Parameters at the core of the algorithm</p>
+<p>Paramters for your github account</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.digest">
-<span class="sig-name descname"><span class="pre">digest</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sha256'</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.digest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.encoding">
-<span class="sig-name descname"><span class="pre">encoding</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'utf-8'</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.encoding" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigLMDB">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigLMDB</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigLMDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigLMDB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytconf.config.Config</span></code></p>
-<p>Parameters that control working with LMDB (experts only)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigLMDB.buffers">
-<span class="sig-name descname"><span class="pre">buffers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pygitpub.configs.ConfigLMDB.buffers" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigLMDB.map_size">
-<span class="sig-name descname"><span class="pre">map_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000000000000</span></em><a class="headerlink" href="#pygitpub.configs.ConfigLMDB.map_size" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigScan">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigScan</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigScan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigScan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytconf.config.Config</span></code></p>
-<p>Parameters that control the scanning phase</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pygitpub.configs.ConfigScan.folder">
-<span class="sig-name descname"><span class="pre">folder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.'</span></em><a class="headerlink" href="#pygitpub.configs.ConfigScan.folder" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigGithub.username">
+<span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pytconf.param.Unique</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#pygitpub.configs.ConfigGithub.username" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -115,6 +81,11 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pygitpub.utils.get_number_of_files">
 <span class="sig-prename descclassname"><span class="pre">pygitpub.utils.</span></span><span class="sig-name descname"><span class="pre">get_number_of_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/pygitpub/utils.html#get_number_of_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.utils.get_number_of_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.utils.github_login">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.utils.</span></span><span class="sig-name descname"><span class="pre">github_login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pygitpub/utils.html#github_login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.utils.github_login" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
