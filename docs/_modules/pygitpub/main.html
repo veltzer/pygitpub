@@ -54,6 +54,20 @@
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">workflow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">conclusion</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="show_failing_run"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.show_failing_run">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show failing workflows&quot;</span><span class="p">,</span>
+    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">ConfigGithub</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">show_failing_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">github_login</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
                 <span class="n">last_run</span> <span class="o">=</span> <span class="n">run</span>
                 <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
