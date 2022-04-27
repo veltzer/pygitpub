@@ -1,0 +1,18 @@
+# THIS IS AN AUTO-GENERATED FILE. DO NOT EDIT!
+# production requirements
+pytconf
+pylogconf
+tqdm
+lmdb
+# dev requirements
+pyclassifiers
+pypitools
+pydmt
+Sphinx
+pyyaml
+# test requirements
+pylint
+pytest
+pytest-cov
+flake8
+pymakehelper
