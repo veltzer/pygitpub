@@ -1,0 +1,2 @@
+similar projects:
+	https://github.com/anishathalye/periscope
