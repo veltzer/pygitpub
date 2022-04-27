@@ -34,8 +34,7 @@ setuptools.setup(
     install_requires=[
         'pytconf',
         'pylogconf',
-        'tqdm',
-        'lmdb',
+        'PyGithub',
     ],
     extras_require={
     },

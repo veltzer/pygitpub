@@ -12,8 +12,7 @@ setup_requires = [
 run_requires = [
     'pytconf',
     'pylogconf',
-    'tqdm',
-    'lmdb',
+    'PyGithub',
 ]
 
 test_requires = [

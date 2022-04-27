@@ -2,8 +2,7 @@
 # production requirements
 pytconf
 pylogconf
-tqdm
-lmdb
+PyGithub
 # dev requirements
 pyclassifiers
 pypitools
