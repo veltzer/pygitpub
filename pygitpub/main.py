@@ -6,7 +6,6 @@ import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
 
 from pygitpub.configs import ConfigGithub
-from pygitpub.utils import github_login
 from pygitpub.static import VERSION_STR
 
 
@@ -17,7 +16,7 @@ from pygitpub.static import VERSION_STR
     ],
 )
 def show_runs() -> None:
-    g = github_login()
+    g = github.Github(login_or_token=ConfigGithub.token)
     for repo in g.get_user(ConfigGithub.username).get_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
@@ -31,7 +30,7 @@ def show_runs() -> None:
     ],
 )
 def show_failing_run() -> None:
-    g = github_login()
+    g = github.Github(login_or_token=ConfigGithub.token)
     for repo in g.get_user(ConfigGithub.username).get_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
