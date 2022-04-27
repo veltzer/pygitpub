@@ -39,7 +39,6 @@
 <span class="kn">from</span> <span class="nn">pytconf</span> <span class="kn">import</span> <span class="n">register_main</span><span class="p">,</span> <span class="n">config_arg_parse_and_launch</span><span class="p">,</span> <span class="n">register_endpoint</span>
 
 <span class="kn">from</span> <span class="nn">pygitpub.configs</span> <span class="kn">import</span> <span class="n">ConfigGithub</span>
-<span class="kn">from</span> <span class="nn">pygitpub.utils</span> <span class="kn">import</span> <span class="n">github_login</span>
 <span class="kn">from</span> <span class="nn">pygitpub.static</span> <span class="kn">import</span> <span class="n">VERSION_STR</span>
 
 
@@ -50,7 +49,7 @@
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">show_runs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github_login</span><span class="p">()</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
@@ -64,7 +63,7 @@
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">show_failing_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github_login</span><span class="p">()</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
