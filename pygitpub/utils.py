@@ -1,7 +1,5 @@
 import logging
 import os
-import configparser
-import github
 
 from pygitpub import LOGGER_NAME
 
