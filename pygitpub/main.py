@@ -21,6 +21,20 @@ def show_runs() -> None:
     for repo in g.get_user(ConfigGithub.username).get_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
+                print(f"{repo.name}: {workflow.name} {run.conclusion}")
+
+
+@register_endpoint(
+    description="Show failing workflows",
+    configs=[
+        ConfigGithub,
+    ],
+)
+def show_failing_run() -> None:
+    g = github_login()
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        for workflow in repo.get_workflows():
+            for run in workflow.get_runs():
                 last_run = run
                 break
             else:
