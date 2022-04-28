@@ -8,6 +8,36 @@ from pytconf import register_main, config_arg_parse_and_launch, register_endpoin
 import github
 from pygitpub.configs import ConfigGithub
 from pygitpub.static import VERSION_STR
+from pygitpub.utils import delete
+
+
+@register_endpoint(
+    description="Cleanup old failing or un-needed runs",
+    configs=[
+        ConfigGithub,
+    ],
+)
+def runs_cleanup() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        for workflow in repo.get_workflows():
+            existing = 0
+            for run in workflow.get_runs():
+                print(f"inspecting {repo.name} {workflow.name} {run.conclusion}")
+                delete_it = False
+                # if it's a pages build delete it unless it's in mid work (run.conclusion is None)
+                if workflow.name == "pages-build-deployment" and run.conclusion is not None:
+                    delete_it = True
+                # if it's not a paged build and it failed then delete it
+                if workflow.name != "pages-build-deployment" and run.conclusion == "failure":
+                    delete_it = True
+                if existing >= 4:
+                    delete_it = True
+                if delete_it:
+                    print(f"deleting {repo.name} {workflow.name} {run.conclusion} {run.url}")
+                    delete(run)
+                else:
+                    existing += 1
 
 
 @register_endpoint(
@@ -16,7 +46,7 @@ from pygitpub.static import VERSION_STR
         ConfigGithub,
     ],
 )
-def show_runs() -> None:
+def runs_show() -> None:
     g = github.Github(login_or_token=ConfigGithub.token)
     for repo in g.get_user(ConfigGithub.username).get_repos():
         for workflow in repo.get_workflows():
@@ -25,12 +55,12 @@ def show_runs() -> None:
 
 
 @register_endpoint(
-    description="Show failing workflows",
+    description="Show failing workflow last run",
     configs=[
         ConfigGithub,
     ],
 )
-def show_failing_run() -> None:
+def runs_show_failing() -> None:
     g = github.Github(login_or_token=ConfigGithub.token)
     for repo in g.get_user(ConfigGithub.username).get_repos():
         for workflow in repo.get_workflows():
