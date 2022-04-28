@@ -131,7 +131,7 @@ def runs_show_failing() -> None:
                 break
             else:
                 continue
-            if last_run.conclusion != "success":
+            if last_run.conclusion == "failure":
                 print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
 
 
