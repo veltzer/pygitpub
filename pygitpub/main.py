@@ -10,7 +10,7 @@ import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
 
 import github
-from pygitpub.configs import ConfigGithub
+from pygitpub.configs import ConfigGithub, ConfigOutput
 from pygitpub.static import VERSION_STR
 from pygitpub.utils import delete
 
@@ -75,6 +75,7 @@ def repos_list_private() -> None:
     description="Cleanup old failing or un-needed runs",
     configs=[
         ConfigGithub,
+        ConfigOutput,
     ],
 )
 def runs_cleanup() -> None:
@@ -83,7 +84,8 @@ def runs_cleanup() -> None:
         for workflow in repo.get_workflows():
             existing = 0
             for run in workflow.get_runs():
-                print(f"inspecting {repo.name} {workflow.name} {run.conclusion}")
+                if ConfigOutput.verbose:
+                    print(f"inspecting {repo.name} {workflow.name} {run.conclusion}")
                 delete_it = False
                 # if it's a pages build delete it unless it's in mid work (run.conclusion is None)
                 if workflow.name == "pages-build-deployment" and run.conclusion is not None:
