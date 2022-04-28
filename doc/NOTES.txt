@@ -1,0 +1,14 @@
+
+"""
+This is an unauthenticated call, we don't really need an authenticated call
+for what we do here but we still authenticate because it increases our
+rate limit on number of api calls we make...
+
+for authenticated called pass one of:
+1) login_or_token=opt_username, password=opt_password
+    * this will cause issued with 2factor auth)
+2) login_or_token=opt_personal_token
+    The token is generated in the github gui.
+3) client_id=opt_client_id, client_secret=opt_client_secret
+    These items are also generated in the github gui.
+"""
