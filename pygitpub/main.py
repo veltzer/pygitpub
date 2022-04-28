@@ -24,6 +24,19 @@ def repos_list() -> None:
 
 
 @register_endpoint(
+    description="List all private repos",
+    configs=[
+        ConfigGithub,
+    ],
+)
+def repos_list_private() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos(type="private"):
+        if not repo.fork:
+            print(f"{repo.name}")
+
+
+@register_endpoint(
     description="Cleanup old failing or un-needed runs",
     configs=[
         ConfigGithub,

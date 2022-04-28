@@ -56,6 +56,19 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="repos_list_private"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_list_private">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List all private repos&quot;</span><span class="p">,</span>
+    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">ConfigGithub</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">repos_list_private</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;private&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">fork</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="runs_cleanup"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_cleanup">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cleanup old failing or un-needed runs&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
