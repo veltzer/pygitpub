@@ -21,6 +21,21 @@ from pygitpub.utils import delete
         ConfigGithub,
     ],
 )
+def fix_website() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        if repo.homepage == "" or repo.homepage is None:
+            homepage = f"{repo.html_url}"
+            print(f"patching [{repo.name}]...")
+            repo.edit(repo.name, homepage=homepage)
+
+
+@register_endpoint(
+    description="List all repos",
+    configs=[
+        ConfigGithub,
+    ],
+)
 def repos_list_verbose() -> None:
     g = github.Github(login_or_token=ConfigGithub.token)
     for repo in g.get_user(ConfigGithub.username).get_repos():
