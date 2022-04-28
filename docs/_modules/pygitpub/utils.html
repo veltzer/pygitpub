@@ -46,6 +46,15 @@
     <span class="k">for</span> <span class="n">_root</span><span class="p">,</span> <span class="n">_directories</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
         <span class="n">count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">count</span></div>
+
+
+<div class="viewcode-block" id="delete"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.utils.delete">[docs]</a><span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">workflow_run</span><span class="p">):</span>
+    <span class="c1"># stolen from</span>
+    <span class="c1"># https://github.com/PyGithub/PyGithub/blob/master/github/WorkflowRun.py</span>
+    <span class="c1"># which is not yet in released</span>
+    <span class="c1"># pylint: disable=protected-access</span>
+    <span class="n">status</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">workflow_run</span><span class="o">.</span><span class="n">_requester</span><span class="o">.</span><span class="n">requestJson</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">workflow_run</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">204</span></div>
 </pre></div>
 
           </div>

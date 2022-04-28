@@ -41,15 +41,45 @@
 <span class="kn">import</span> <span class="nn">github</span>
 <span class="kn">from</span> <span class="nn">pygitpub.configs</span> <span class="kn">import</span> <span class="n">ConfigGithub</span>
 <span class="kn">from</span> <span class="nn">pygitpub.static</span> <span class="kn">import</span> <span class="n">VERSION_STR</span>
+<span class="kn">from</span> <span class="nn">pygitpub.utils</span> <span class="kn">import</span> <span class="n">delete</span>
 
 
-<div class="viewcode-block" id="show_runs"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.show_runs">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
+<div class="viewcode-block" id="runs_cleanup"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_cleanup">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cleanup old failing or un-needed runs&quot;</span><span class="p">,</span>
+    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">ConfigGithub</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">runs_cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
+            <span class="n">existing</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;inspecting </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">workflow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">conclusion</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">delete_it</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># if it&#39;s a pages build delete it unless it&#39;s in mid work (run.conclusion is None)</span>
+                <span class="k">if</span> <span class="n">workflow</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;pages-build-deployment&quot;</span> <span class="ow">and</span> <span class="n">run</span><span class="o">.</span><span class="n">conclusion</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">delete_it</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># if it&#39;s not a paged build and it failed then delete it</span>
+                <span class="k">if</span> <span class="n">workflow</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;pages-build-deployment&quot;</span> <span class="ow">and</span> <span class="n">run</span><span class="o">.</span><span class="n">conclusion</span> <span class="o">==</span> <span class="s2">&quot;failure&quot;</span><span class="p">:</span>
+                    <span class="n">delete_it</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">existing</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="n">delete_it</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">delete_it</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;deleting </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">workflow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">conclusion</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">delete</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">existing</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="runs_show"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_show">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show workflow runs&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">show_runs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">runs_show</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
@@ -57,13 +87,13 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">workflow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">conclusion</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="show_failing_run"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.show_failing_run">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show failing workflows&quot;</span><span class="p">,</span>
+<div class="viewcode-block" id="runs_show_failing"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_show_failing">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show failing workflow last run&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">show_failing_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">runs_show_failing</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
