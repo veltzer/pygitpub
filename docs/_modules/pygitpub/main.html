@@ -178,13 +178,12 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;project [</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">] exists, skipping it because of .skip file...&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;project [</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">] does not exists, cloning it...&quot;</span><span class="p">)</span>
-            <span class="c1"># print(dir(repo))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;project [</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">] does not exists, cloning it from [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">ssh_url</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="s2">&quot;git&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;clone&quot;</span><span class="p">,</span>
-                    <span class="n">repo</span><span class="o">.</span><span class="n">clone_url</span><span class="p">,</span>
+                    <span class="n">repo</span><span class="o">.</span><span class="n">ssh_url</span><span class="p">,</span>
                 <span class="p">]</span>
             <span class="p">)</span>
         <span class="n">done</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
