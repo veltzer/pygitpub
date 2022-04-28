@@ -157,5 +157,5 @@ $(TOOLS): packages.txt config/deps.py
 $(ALL_SH_STAMP): out/%.stamp: % .shellcheckrc
 	$(info doing [$@])
 	$(Q)mkdir -p $(dir $@)
-	$(Q)shellcheck --shell=bash --external-sources --source-path="$$HOME" $<
+	$(Q)shellcheck --shell=bash $<
 	$(Q)touch $@
