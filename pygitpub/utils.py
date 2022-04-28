@@ -13,3 +13,12 @@ def get_number_of_files(folder: str) -> int:
     for _root, _directories, files in os.walk(folder):
         count += len(files)
     return count
+
+
+def delete(workflow_run):
+    # stolen from
+    # https://github.com/PyGithub/PyGithub/blob/master/github/WorkflowRun.py
+    # which is not yet in released
+    # pylint: disable=protected-access
+    status, _, _ = workflow_run._requester.requestJson("DELETE", workflow_run.url)
+    return status == 204
