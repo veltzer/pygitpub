@@ -2,6 +2,10 @@
 main entry point to the program
 """
 
+import os
+import subprocess
+import glob
+
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
 
@@ -112,6 +116,63 @@ def runs_show_failing() -> None:
                 continue
             if last_run.conclusion != "success":
                 print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
+
+
+@register_endpoint(
+    description="Pull all projects from github",
+    configs=[
+        ConfigGithub,
+    ],
+)
+def pull_all() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    done = set()
+    for repo in g.get_user().get_repos():
+        folder = repo.name
+        project = folder
+        if os.path.isdir(folder):
+            if not os.path.isfile(os.path.join(folder, ".skip")):
+                print(f"project [{project}] exists, pulling it...")
+                os.chdir(folder)
+                subprocess.check_call(
+                    [
+                        "git",
+                        "pull",
+                        # '--tags',
+                    ]
+                )
+                os.chdir("..")
+            else:
+                print(f"project [{project}] exists, skipping it because of .skip file...")
+        else:
+            print(f"project [{project}] does not exists, cloning it...")
+            # print(dir(repo))
+            subprocess.check_call(
+                [
+                    "git",
+                    "clone",
+                    repo.clone_url,
+                ]
+            )
+        done.add(folder)
+
+    for gitfolder in glob.glob("*/.git"):
+        folder = os.path.split(gitfolder)[0]
+        if folder not in done:
+            project = folder
+            if not os.path.isfile(os.path.join(folder, ".skip")):
+                print(f"doing non-github project [{project}]")
+                os.chdir(folder)
+                subprocess.check_call(
+                    [
+                        "git",
+                        "pull",
+                        # '--tags',
+                    ]
+                )
+                os.chdir("..")
+            else:
+                print(f"skipping non-github project [{project}]")
 
 
 @register_main(
