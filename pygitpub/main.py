@@ -17,6 +17,22 @@ from pygitpub.utils import delete
         ConfigGithub,
     ],
 )
+def repos_list_verbose() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        if repo.description is None:
+            description = "NONE"
+        else:
+            description = repo.description
+        print(",".join([repo.name, description, str(repo.fork)]))
+
+
+@register_endpoint(
+    description="List all repos",
+    configs=[
+        ConfigGithub,
+    ],
+)
 def repos_list() -> None:
     g = github.Github(login_or_token=ConfigGithub.token)
     for repo in g.get_user(ConfigGithub.username).get_repos():
