@@ -145,13 +145,12 @@ def pull_all() -> None:
             else:
                 print(f"project [{project}] exists, skipping it because of .skip file...")
         else:
-            print(f"project [{project}] does not exists, cloning it...")
-            # print(dir(repo))
+            print(f"project [{project}] does not exists, cloning it from [{repo.ssh_url}]...")
             subprocess.check_call(
                 [
                     "git",
                     "clone",
-                    repo.clone_url,
+                    repo.ssh_url,
                 ]
             )
         done.add(folder)
