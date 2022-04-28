@@ -31,7 +31,7 @@ def repos_list() -> None:
 )
 def repos_list_private() -> None:
     g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos(type="private"):
+    for repo in g.get_user().get_repos(type="private"):
         if not repo.fork:
             print(f"{repo.name}")
 
