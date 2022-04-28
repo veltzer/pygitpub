@@ -1,8 +1,1 @@
-- add command to list all entries in the db with a folder filter which by default
-    will be "."
-- add command to delete all entries in the db with a folder prefix which by default
-    will be "."
-- do the dup command!. by default it will only work on entries which start with the current
-    folder.
-- the cursor class of lmdb has a "set_range" method which we can use to query only
-    elements in a certain folder.
+- add all github_*.sh functionality to this repo.
