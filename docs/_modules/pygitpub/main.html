@@ -105,7 +105,7 @@
 
 
 <div class="viewcode-block" id="runs_cleanup"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_cleanup">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cleanup old failing or un-needed runs&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cleanup old failing or un-needed runs in all workflows in all repositories&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
         <span class="n">ConfigOutput</span><span class="p">,</span>
@@ -136,7 +136,7 @@
 
 
 <div class="viewcode-block" id="runs_show"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_show">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show workflow runs&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all runs in all workflows in all repos&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
     <span class="p">],</span>
@@ -150,7 +150,7 @@
 
 
 <div class="viewcode-block" id="runs_show_running"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_show_running">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show workflow currently running&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all running runs in all workflows in all repositories&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
     <span class="p">],</span>
@@ -165,7 +165,7 @@
 
 
 <div class="viewcode-block" id="runs_show_failing"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_show_failing">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show failing workflow last run&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all runs which are last and failing in all workflows and all repositories&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
     <span class="p">],</span>
