@@ -72,7 +72,7 @@ def repos_list_private() -> None:
 
 
 @register_endpoint(
-    description="Cleanup old failing or un-needed runs",
+    description="Cleanup old failing or un-needed runs in all workflows in all repositories",
     configs=[
         ConfigGithub,
         ConfigOutput,
@@ -103,7 +103,7 @@ def runs_cleanup() -> None:
 
 
 @register_endpoint(
-    description="Show workflow runs",
+    description="Show all runs in all workflows in all repos",
     configs=[
         ConfigGithub,
     ],
@@ -117,7 +117,7 @@ def runs_show() -> None:
 
 
 @register_endpoint(
-    description="Show workflow currently running",
+    description="Show all running runs in all workflows in all repositories",
     configs=[
         ConfigGithub,
     ],
@@ -132,7 +132,7 @@ def runs_show_running() -> None:
 
 
 @register_endpoint(
-    description="Show failing workflow last run",
+    description="Show all runs which are last and failing in all workflows and all repositories",
     configs=[
         ConfigGithub,
     ],
