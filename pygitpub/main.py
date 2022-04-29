@@ -117,6 +117,21 @@ def runs_show() -> None:
 
 
 @register_endpoint(
+    description="Show workflow currently running",
+    configs=[
+        ConfigGithub,
+    ],
+)
+def runs_show_running() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        for workflow in repo.get_workflows():
+            for run in workflow.get_runs():
+                if run.conclusion is None:
+                    print(f"{repo.name}: {workflow.name} {run.conclusion}")
+
+
+@register_endpoint(
     description="Show failing workflow last run",
     configs=[
         ConfigGithub,
