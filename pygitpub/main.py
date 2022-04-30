@@ -5,6 +5,7 @@ main entry point to the program
 import os
 import subprocess
 import glob
+import sys
 
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
@@ -204,6 +205,23 @@ def pull_all() -> None:
                 os.chdir("..")
             else:
                 print(f"skipping non-github project [{project}]")
+
+
+@register_endpoint(
+    description="Run all workflows",
+    configs=[
+        ConfigGithub,
+        ConfigOutput,
+    ],
+)
+def workflows_run() -> None:
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        for workflow in repo.get_workflows():
+            print(f"{repo.name}: {workflow.name}...", end='')
+            sys.stdout.flush()
+            ret = workflow.create_dispatch(ref="master")
+            print(f"f{ret}")
 
 
 @register_main(
