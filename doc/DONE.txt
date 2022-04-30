@@ -3,3 +3,4 @@
 	I want to see only things getting cleaned by default
 	and not all runs considered.
 	have an options to see all runs considered too.
+- add the ability to run all workflows.
