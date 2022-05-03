@@ -221,7 +221,7 @@ def workflows_run() -> None:
             print(f"{repo.name}: {workflow.name}...", end='')
             sys.stdout.flush()
             ret = workflow.create_dispatch(ref="master")
-            print(f"f{ret}")
+            print(f"{ret}")
 
 
 @register_main(
