@@ -6,7 +6,7 @@ console_scripts = [
     "pygitpub=pygitpub.main:main",
 ]
 
-run_requires = [
+install_requires = [
     "pytconf",
     "pylogconf",
     "PyGithub",
