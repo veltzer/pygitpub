@@ -5,13 +5,18 @@ package_name = config.project.project_name
 console_scripts = [
     "pygitpub=pygitpub.main:main",
 ]
-
+dev_requires = [
+    "pyclassifiers",
+    "pypitools",
+    "pydmt",
+    "Sphinx",
+    "pyyaml",
+]
 install_requires = [
     "pytconf",
     "pylogconf",
     "PyGithub",
 ]
-
 test_requires = [
     "pylint",
     "pytest",
@@ -20,14 +25,7 @@ test_requires = [
     "pymakehelper",
 ]
 
-dev_requires = [
-    "pyclassifiers",
-    "pypitools",
-    "pydmt",
-    "Sphinx",
-    "pyyaml",
-]
+python_requires = ">=3.10"
 
-python_requires = ">=3.9"
-test_os = ["ubuntu-20.04"]
-test_python = ["3.9"]
+test_os = ["ubuntu-22.04"]
+test_python = ["3.10"]
