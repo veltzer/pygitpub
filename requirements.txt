@@ -1,8 +1,4 @@
 # THIS IS AN AUTO-GENERATED FILE. DO NOT EDIT!
-# production requirements
-pytconf
-pylogconf
-PyGithub
 # dev requirements
 pyclassifiers
 pypitools
