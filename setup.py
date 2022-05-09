@@ -31,6 +31,11 @@ setuptools.setup(
     platforms=[
         'python3',
     ],
+    install_requires=[
+        'pytconf',
+        'pylogconf',
+        'PyGithub',
+    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
@@ -47,5 +52,5 @@ setuptools.setup(
     entry_points={"console_scripts": [
         'pygitpub=pygitpub.main:main',
     ]},
-    python_requires=">=3.9",
+    python_requires=">=3.10",
 )
