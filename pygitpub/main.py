@@ -17,7 +17,7 @@ from pygitpub.utils import delete
 
 
 @register_endpoint(
-    description="List all repos",
+    description="Set the correct website for the project on all repos where it is not correct",
     configs=[
         ConfigGithub,
     ],
