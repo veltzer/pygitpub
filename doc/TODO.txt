@@ -1,4 +1,1 @@
-- add all github_*.sh functionality to this repo.
-- the command 'repos_list' does not list private repos
-	add option to control that and also list private repos.
-	make sure that this will also work for all other commands.
+integrate the stuff in bin/gibhu
