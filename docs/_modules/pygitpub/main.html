@@ -44,65 +44,60 @@
 <span class="kn">from</span> <span class="nn">pytconf</span> <span class="kn">import</span> <span class="n">register_main</span><span class="p">,</span> <span class="n">config_arg_parse_and_launch</span><span class="p">,</span> <span class="n">register_endpoint</span>
 
 <span class="kn">import</span> <span class="nn">github</span>
-<span class="kn">from</span> <span class="nn">pygitpub.configs</span> <span class="kn">import</span> <span class="n">ConfigGithub</span><span class="p">,</span> <span class="n">ConfigOutput</span>
+<span class="kn">from</span> <span class="nn">pygitpub.configs</span> <span class="kn">import</span> <span class="n">ConfigGithub</span><span class="p">,</span> <span class="n">ConfigOutput</span><span class="p">,</span> <span class="n">ConfigAlgo</span>
 <span class="kn">from</span> <span class="nn">pygitpub.static</span> <span class="kn">import</span> <span class="n">VERSION_STR</span>
 <span class="kn">from</span> <span class="nn">pygitpub.utils</span> <span class="kn">import</span> <span class="n">delete</span>
+
+
+<div class="viewcode-block" id="yield_repos"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.yield_repos">[docs]</a><span class="k">def</span> <span class="nf">yield_repos</span><span class="p">():</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+        <span class="k">yield</span> <span class="n">repo</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">()</span><span class="o">.</span><span class="n">get_repos</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;private&quot;</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">repo</span></div>
 
 
 <div class="viewcode-block" id="fix_website"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.fix_website">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set the correct website for the project on all repos where it is not correct&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">fix_website</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">homepage</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">repo</span><span class="o">.</span><span class="n">homepage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">homepage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">html_url</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patching [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
             <span class="n">repo</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">homepage</span><span class="o">=</span><span class="n">homepage</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="repos_list_verbose"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_list_verbose">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List all repos&quot;</span><span class="p">,</span>
-    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">ConfigGithub</span><span class="p">,</span>
-    <span class="p">],</span>
-<span class="p">)</span>
-<span class="k">def</span> <span class="nf">repos_list_verbose</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;NONE&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">description</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">description</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">fork</span><span class="p">)]))</span></div>
-
-
 <div class="viewcode-block" id="repos_list"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_list">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List all repos&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List repos&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigOutput</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">repos_list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="repos_list_private"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_list_private">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List all private repos&quot;</span><span class="p">,</span>
-    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">ConfigGithub</span><span class="p">,</span>
-    <span class="p">],</span>
-<span class="p">)</span>
-<span class="k">def</span> <span class="nf">repos_list_private</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">()</span><span class="o">.</span><span class="n">get_repos</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;private&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">fork</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
+        <span class="n">show</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">ConfigAlgo</span><span class="o">.</span><span class="n">private</span> <span class="ow">and</span> <span class="n">repo</span><span class="o">.</span><span class="n">private</span><span class="p">:</span>
+            <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">ConfigAlgo</span><span class="o">.</span><span class="n">public</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">private</span><span class="p">:</span>
+            <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ConfigAlgo</span><span class="o">.</span><span class="n">fork</span> <span class="ow">and</span> <span class="n">repo</span><span class="o">.</span><span class="n">fork</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">ConfigOutput</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;NONE&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">description</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">description</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">fork</span><span class="p">)]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="runs_cleanup"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.runs_cleanup">[docs]</a><span class="nd">@register_endpoint</span><span class="p">(</span>
@@ -110,11 +105,11 @@
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
         <span class="n">ConfigOutput</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">runs_cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="n">existing</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
@@ -140,11 +135,11 @@
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all runs in all workflows in all repos&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">runs_show</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">workflow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">conclusion</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
@@ -154,11 +149,11 @@
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all running runs in all workflows in all repositories&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">runs_show_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">conclusion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -169,11 +164,11 @@
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all runs which are last and failing in all workflows and all repositories&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">runs_show_failing</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">workflow</span><span class="o">.</span><span class="n">get_runs</span><span class="p">():</span>
                 <span class="n">last_run</span> <span class="o">=</span> <span class="n">run</span>
@@ -191,9 +186,8 @@
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">pull_all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
     <span class="n">done</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">()</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="n">folder</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">name</span>
         <span class="n">project</span> <span class="o">=</span> <span class="n">folder</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
@@ -245,11 +239,11 @@
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
         <span class="n">ConfigOutput</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">workflows_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">github</span><span class="o">.</span><span class="n">Github</span><span class="p">(</span><span class="n">login_or_token</span><span class="o">=</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_workflows</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">workflow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
