@@ -11,20 +11,28 @@ import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
 
 import github
-from pygitpub.configs import ConfigGithub, ConfigOutput
+from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
 from pygitpub.static import VERSION_STR
 from pygitpub.utils import delete
+
+
+def yield_repos():
+    g = github.Github(login_or_token=ConfigGithub.token)
+    for repo in g.get_user(ConfigGithub.username).get_repos():
+        yield repo
+    for repo in g.get_user().get_repos(type="private"):
+        yield repo
 
 
 @register_endpoint(
     description="Set the correct website for the project on all repos where it is not correct",
     configs=[
         ConfigGithub,
+        ConfigAlgo,
     ],
 )
 def fix_website() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    for repo in yield_repos():
         if repo.homepage == "" or repo.homepage is None:
             homepage = f"{repo.html_url}"
             print(f"patching [{repo.name}]...")
@@ -32,44 +40,31 @@ def fix_website() -> None:
 
 
 @register_endpoint(
-    description="List all repos",
+    description="List repos",
     configs=[
         ConfigGithub,
-    ],
-)
-def repos_list_verbose() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
-        if repo.description is None:
-            description = "NONE"
-        else:
-            description = repo.description
-        print(",".join([repo.name, description, str(repo.fork)]))
-
-
-@register_endpoint(
-    description="List all repos",
-    configs=[
-        ConfigGithub,
+        ConfigOutput,
+        ConfigAlgo,
     ],
 )
 def repos_list() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
-        print(repo.name)
-
-
-@register_endpoint(
-    description="List all private repos",
-    configs=[
-        ConfigGithub,
-    ],
-)
-def repos_list_private() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user().get_repos(type="private"):
-        if not repo.fork:
-            print(f"{repo.name}")
+    for repo in yield_repos():
+        show = False
+        if ConfigAlgo.private and repo.private:
+            show = True
+        if ConfigAlgo.public and not repo.private:
+            show = True
+        if show:
+            if not ConfigAlgo.fork and repo.fork:
+                continue
+            if ConfigOutput.verbose:
+                if repo.description is None:
+                    description = "NONE"
+                else:
+                    description = repo.description
+                print(",".join([repo.name, description, str(repo.fork)]))
+            else:
+                print(f"{repo.name}")
 
 
 @register_endpoint(
@@ -77,11 +72,11 @@ def repos_list_private() -> None:
     configs=[
         ConfigGithub,
         ConfigOutput,
+        ConfigAlgo,
     ],
 )
 def runs_cleanup() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    for repo in yield_repos():
         for workflow in repo.get_workflows():
             existing = 0
             for run in workflow.get_runs():
@@ -107,11 +102,11 @@ def runs_cleanup() -> None:
     description="Show all runs in all workflows in all repos",
     configs=[
         ConfigGithub,
+        ConfigAlgo,
     ],
 )
 def runs_show() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    for repo in yield_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
                 print(f"{repo.name}: {workflow.name} {run.conclusion}")
@@ -121,11 +116,11 @@ def runs_show() -> None:
     description="Show all running runs in all workflows in all repositories",
     configs=[
         ConfigGithub,
+        ConfigAlgo,
     ],
 )
 def runs_show_running() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    for repo in yield_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
                 if run.conclusion is None:
@@ -136,11 +131,11 @@ def runs_show_running() -> None:
     description="Show all runs which are last and failing in all workflows and all repositories",
     configs=[
         ConfigGithub,
+        ConfigAlgo,
     ],
 )
 def runs_show_failing() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    for repo in yield_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
                 last_run = run
@@ -158,9 +153,8 @@ def runs_show_failing() -> None:
     ],
 )
 def pull_all() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
     done = set()
-    for repo in g.get_user().get_repos():
+    for repo in yield_repos():
         folder = repo.name
         project = folder
         if os.path.isdir(folder):
@@ -212,11 +206,11 @@ def pull_all() -> None:
     configs=[
         ConfigGithub,
         ConfigOutput,
+        ConfigAlgo,
     ],
 )
 def workflows_run() -> None:
-    g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    for repo in yield_repos():
         for workflow in repo.get_workflows():
             print(f"{repo.name}: {workflow.name}...", end='')
             sys.stdout.flush()

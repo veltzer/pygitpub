@@ -4,3 +4,7 @@
 	and not all runs considered.
 	have an options to see all runs considered too.
 - add the ability to run all workflows.
+- the command 'repos_list' does not list private repos
+	add option to control that and also list private repos.
+	make sure that this will also work for all other commands.
+- add all github_*.sh functionality to this repo.

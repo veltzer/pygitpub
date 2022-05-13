@@ -16,6 +16,24 @@ class ConfigGithub(Config):
     )
 
 
+class ConfigAlgo(Config):
+    """
+    Parameters to control the algorithm
+    """
+    private = ParamCreator.create_bool(
+        help_string="Include private repos?",
+        default=True,
+    )
+    public = ParamCreator.create_bool(
+        help_string="Include public repos?",
+        default=True,
+    )
+    fork = ParamCreator.create_bool(
+        help_string="Include forks?",
+        default=False,
+    )
+
+
 class ConfigOutput(Config):
     """
     Parameters to control output
