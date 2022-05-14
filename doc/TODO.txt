@@ -1,1 +1,4 @@
-improve the method 'yield_repos' to only make one function call and not two.
+- improve the method 'yield_repos' to only make one function call and not two.
+- allow to cleanup runs which were trigger by the user and not by a commit.
+	(runs which you dont see a branch next to when you look at the "actions"
+	page at github)
