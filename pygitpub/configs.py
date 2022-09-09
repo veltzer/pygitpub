@@ -14,6 +14,9 @@ class ConfigGithub(Config):
     token = ParamCreator.create_str(
         help_string="What is your github token?",
     )
+    token_name = ParamCreator.create_str(
+        help_string="What is the name of the token on github?",
+    )
 
 
 class ConfigAlgo(Config):
