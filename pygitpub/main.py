@@ -4,7 +4,6 @@ main entry point to the program
 
 import os
 import subprocess
-import glob
 import sys
 
 import pylogconf.core
@@ -157,7 +156,6 @@ def runs_show_failing() -> None:
     ],
 )
 def pull_all() -> None:
-    done = set()
     for repo in yield_repos():
         folder = repo.name
         project = folder
@@ -184,25 +182,27 @@ def pull_all() -> None:
                     repo.ssh_url,
                 ]
             )
-        done.add(folder)
 
-    for gitfolder in glob.glob("*/.git"):
-        folder = os.path.split(gitfolder)[0]
-        if folder not in done:
-            project = folder
-            if not os.path.isfile(os.path.join(folder, ".skip")):
-                print(f"doing non-github project [{project}]")
-                os.chdir(folder)
-                subprocess.check_call(
-                    [
-                        "git",
-                        "pull",
-                        # '--tags',
-                    ]
-                )
-                os.chdir("..")
-            else:
-                print(f"skipping non-github project [{project}]")
+
+@register_endpoint(
+    description="Pull all projects from github",
+    configs=[
+        ConfigGithub,
+    ],
+)
+def clone_all() -> None:
+    for repo in yield_repos():
+        folder = repo.name
+        project = folder
+        if not os.path.isdir(folder):
+            print(f"project [{project}] does not exists, cloning it from [{repo.ssh_url}]...")
+            subprocess.check_call(
+                [
+                    "git",
+                    "clone",
+                    repo.ssh_url,
+                ]
+            )
 
 
 @register_endpoint(
