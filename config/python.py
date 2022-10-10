@@ -2,19 +2,21 @@ console_scripts = [
     "pygitpub=pygitpub.main:main",
 ]
 dev_requires = [
-    "pyclassifiers",
     "pypitools",
-    "Sphinx",
-    "pyyaml",
 ]
 install_requires = [
     "pytconf",
     "pylogconf",
     "PyGithub",
 ]
+config_requires = [
+    "pyyaml",
+]
 make_requires = [
+    "pyclassifiers",
     "pymakehelper",
     "pydmt",
+    "Sphinx",
 ]
 test_requires = [
     "pylint",
