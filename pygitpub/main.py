@@ -17,16 +17,11 @@ from pygitpub.utils import delete
 
 def yield_repos():
     g = github.Github(login_or_token=ConfigGithub.token)
-    for repo in g.get_user(ConfigGithub.username).get_repos():
+    name = g.get_user().name
+    for repo in g.get_user().get_repos():
         if not ConfigAlgo.fork and repo.fork:
             continue
-        if not ConfigAlgo.private and repo.private:
-            continue
-        if not ConfigAlgo.public and not repo.private:
-            continue
-        yield repo
-    for repo in g.get_user().get_repos(type="private"):
-        if not ConfigAlgo.fork and repo.fork:
+        if ConfigAlgo.owner and repo.owner.name != name:
             continue
         if not ConfigAlgo.private and repo.private:
             continue
@@ -61,11 +56,7 @@ def fix_website() -> None:
 def repos_list() -> None:
     for repo in yield_repos():
         if ConfigOutput.verbose:
-            if repo.description is None:
-                description = "NONE"
-            else:
-                description = repo.description
-            print(",".join([repo.name, description, str(repo.fork)]))
+            print(",".join([repo.name, str(repo.description), str(repo.fork), str(repo.owner.name)]))
         else:
             print(f"{repo.name}")
 
