@@ -35,6 +35,10 @@ class ConfigAlgo(Config):
         help_string="Include forks?",
         default=False,
     )
+    owner = ParamCreator.create_bool(
+        help_string="Only include repos owned by the current user?",
+        default=True,
+    )
 
 
 class ConfigOutput(Config):
