@@ -3,11 +3,3 @@
 pytconf
 pylogconf
 PyGithub
-# dev requirements
-pypitools
-# test requirements
-pylint
-pytest
-pytest-cov
-flake8
-mypy
