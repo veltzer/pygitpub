@@ -185,6 +185,7 @@ def clone_all() -> None:
     for repo in yield_repos():
         folder = repo.name
         project = folder
+        print(f"considering [{project}] from [{repo.ssh_url}]...")
         if not os.path.isdir(folder):
             print(f"project [{project}] does not exists, cloning it from [{repo.ssh_url}]...")
             subprocess.check_call(
