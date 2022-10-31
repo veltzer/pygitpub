@@ -37,7 +37,7 @@ class ConfigAlgo(Config):
     )
     owner = ParamCreator.create_bool(
         help_string="Only include repos owned by the current user?",
-        default=True,
+        default=False,
     )
 
 
