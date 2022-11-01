@@ -238,6 +238,8 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;skipping [</span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s2">] as it is already cloned...&quot;</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;project [</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">] does not exist, cloning it from [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">ssh_url</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ConfigAlgo</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="k">continue</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="s2">&quot;git&quot;</span><span class="p">,</span>

@@ -70,6 +70,10 @@
         <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Include forks?&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">dryrun</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_bool</span><span class="p">(</span>
+        <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Do a try run?&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">owner_login</span> <span class="o">=</span> <span class="n">ParamCreator</span><span class="o">.</span><span class="n">create_str_or_none</span><span class="p">(</span>
         <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Only include repos owned by this owner (None for dont mind)&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
