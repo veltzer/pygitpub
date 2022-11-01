@@ -22,7 +22,7 @@ def yield_repos():
         skip = False
         if not ConfigAlgo.fork and repo.fork:
             skip = True
-        if ConfigAlgo.owner and repo.owner.name != name:
+        if ConfigAlgo.owner is not None and repo.owner.name != ConfigAlgo.owner:
             skip = True
         if not ConfigAlgo.private and repo.private:
             skip = True
