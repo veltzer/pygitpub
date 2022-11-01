@@ -17,19 +17,23 @@ from pygitpub.utils import delete
 
 def yield_repos():
     g = github.Github(login_or_token=ConfigGithub.token)
-    name = g.get_user().name
     for repo in g.get_user().get_repos():
+        reason = "no reason set"
         skip = False
         if not ConfigAlgo.fork and repo.fork:
+            reason = "repo is a fork"
             skip = True
         if ConfigAlgo.owner is not None and repo.owner.name != ConfigAlgo.owner:
+            reason = f"wrong owner [{repo.owner.name}]"
             skip = True
         if not ConfigAlgo.private and repo.private:
+            reason = "repo is private"
             skip = True
         if not ConfigAlgo.public and not repo.private:
+            reason = "repo is public"
             skip = True
         if skip:
-            print(f"skipping [{repo.name}]...")
+            print(f"skipping [{repo.name}] because [{reason}]...")
             continue
         yield repo
 
