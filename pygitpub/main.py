@@ -5,6 +5,7 @@ main entry point to the program
 import os
 import subprocess
 import sys
+import json
 
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
@@ -65,7 +66,7 @@ def fix_website() -> None:
 def repos_list() -> None:
     for repo in yield_repos():
         if ConfigOutput.verbose:
-            print(",".join([repo.name, str(repo.description), str(repo.fork), str(repo.owner.name)]))
+            json.dump(obj=repo, fp=sys.stdout)
         else:
             print(f"{repo.name}")
 
