@@ -1,0 +1,2 @@
+To clone all repos by a certain owner:
+	$ pygitpub clone_all --owner_login=LiteBC
