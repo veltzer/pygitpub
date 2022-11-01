@@ -68,7 +68,8 @@
             <span class="n">reason</span> <span class="o">=</span> <span class="s2">&quot;repo is public&quot;</span>
             <span class="n">skip</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">skip</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;skipping [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] because [</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ConfigOutput</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;skipping [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] because [</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="k">yield</span> <span class="n">repo</span></div>
 
