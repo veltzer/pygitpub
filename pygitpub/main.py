@@ -19,13 +19,17 @@ def yield_repos():
     g = github.Github(login_or_token=ConfigGithub.token)
     name = g.get_user().name
     for repo in g.get_user().get_repos():
+        skip = False
         if not ConfigAlgo.fork and repo.fork:
-            continue
+            skip = True
         if ConfigAlgo.owner and repo.owner.name != name:
-            continue
+            skip = True
         if not ConfigAlgo.private and repo.private:
-            continue
+            skip = True
         if not ConfigAlgo.public and not repo.private:
+            skip = True
+        if skip:
+            print(f"skipping [{name}]...")
             continue
         yield repo
 
