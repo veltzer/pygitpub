@@ -33,7 +33,8 @@ def yield_repos():
             reason = "repo is public"
             skip = True
         if skip:
-            print(f"skipping [{repo.name}] because [{reason}]...")
+            if ConfigOutput.verbose:
+                print(f"skipping [{repo.name}] because [{reason}]...")
             continue
         yield repo
 
