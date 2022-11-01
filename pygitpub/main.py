@@ -29,7 +29,7 @@ def yield_repos():
         if not ConfigAlgo.public and not repo.private:
             skip = True
         if skip:
-            print(f"skipping [{name}]...")
+            print(f"skipping [{repo.name}]...")
             continue
         yield repo
 
