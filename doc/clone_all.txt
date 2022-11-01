@@ -1,0 +1,14 @@
+How should we tell pygitpub not to clone certain repos?
+
+Why would we want that?
+- repos are too big
+- we have a list of repos we know we don't want (negative selection).
+- we know which repos we need and don't need any other repos (positive selection).
+
+Ideas
+- parameter of list of repos we want
+- parameter of list of repos we don't want
+- regexp for repos we want
+- file on disk where we clone that says "don't clone me".
+
+Which one is best?
