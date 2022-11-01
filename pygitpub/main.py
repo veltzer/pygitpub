@@ -66,7 +66,8 @@ def fix_website() -> None:
 def repos_list() -> None:
     for repo in yield_repos():
         if ConfigOutput.verbose:
-            json.dump(obj=repo, fp=sys.stdout)
+            obj = json.loads(repo.raw_data)
+            json.dump(obj=obj, fp=sys.stdout, indent=4, sort_keys=True)
         else:
             print(f"{repo.name}")
 
