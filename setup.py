@@ -9,7 +9,7 @@ def get_readme():
 setuptools.setup(
     # the first three fields are a must according to the documentation
     name="pygitpub",
-    version="0.0.31",
+    version="0.0.32",
     packages=[
         'pygitpub',
     ],
