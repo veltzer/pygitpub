@@ -24,8 +24,8 @@ def yield_repos():
         if not ConfigAlgo.fork and repo.fork:
             reason = "repo is a fork"
             skip = True
-        if ConfigAlgo.owner is not None and repo.owner.name != ConfigAlgo.owner:
-            reason = f"wrong owner [{repo.owner.name}]"
+        if ConfigAlgo.owner_login is not None and repo.owner.login != ConfigAlgo.owner_login:
+            reason = f"wrong owner [{repo.owner.login}]"
             skip = True
         if not ConfigAlgo.private and repo.private:
             reason = "repo is private"
