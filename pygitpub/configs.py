@@ -35,6 +35,10 @@ class ConfigAlgo(Config):
         help_string="Include forks?",
         default=False,
     )
+    dryrun = ParamCreator.create_bool(
+        help_string="Do a try run?",
+        default=False,
+    )
     owner_login = ParamCreator.create_str_or_none(
         help_string="Only include repos owned by this owner (None for dont mind)",
         default=None,
