@@ -190,15 +190,17 @@ def clone_all() -> None:
         folder = repo.name
         project = folder
         print(f"considering [{project}] from [{repo.ssh_url}]...")
-        if not os.path.isdir(folder):
-            print(f"project [{project}] does not exists, cloning it from [{repo.ssh_url}]...")
-            subprocess.check_call(
-                [
-                    "git",
-                    "clone",
-                    repo.ssh_url,
-                ]
-            )
+        if os.path.isfile(folder):
+            print(f"skipping [{folder}]...")
+            continue
+        print(f"project [{project}] does not exist, cloning it from [{repo.ssh_url}]...")
+        subprocess.check_call(
+            [
+                "git",
+                "clone",
+                repo.ssh_url,
+            ]
+        )
 
 
 @register_endpoint(

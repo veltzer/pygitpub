@@ -9,6 +9,10 @@ Ideas
 - parameter of list of repos we want
 - parameter of list of repos we don't want
 - regexp for repos we want
-- file on disk where we clone that says "don't clone me".
+- file or folder on disk where we clone that says "don't clone me".
 
 Which one is best?
+I think the file is the best one since:
+- you cant have a folder and a file with the same name in the same folder.
+- you see which ones are files and which ones are folders and this tells you which repos
+	are really clones and which ones are not.
