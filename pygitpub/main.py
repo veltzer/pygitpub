@@ -191,7 +191,10 @@ def clone_all() -> None:
         project = folder
         print(f"considering [{project}] from [{repo.ssh_url}]...")
         if os.path.isfile(folder):
-            print(f"skipping [{folder}]...")
+            print(f"skipping [{folder}] as it is not to be cloned...")
+            continue
+        if os.path.isdir(folder):
+            print(f"skipping [{folder}] as it is already cloned...")
             continue
         print(f"project [{project}] does not exist, cloning it from [{repo.ssh_url}]...")
         subprocess.check_call(
