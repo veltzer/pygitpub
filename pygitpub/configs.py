@@ -35,9 +35,9 @@ class ConfigAlgo(Config):
         help_string="Include forks?",
         default=False,
     )
-    owner = ParamCreator.create_bool(
-        help_string="Only include repos owned by the current user?",
-        default=False,
+    owner = ParamCreator.create_str_or_none(
+        help_string="Only include repos owned by this owner (None for dont mind)",
+        default=None,
     )
 
 
