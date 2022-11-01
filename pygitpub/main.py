@@ -203,6 +203,8 @@ def clone_all() -> None:
             print(f"skipping [{folder}] as it is already cloned...")
             continue
         print(f"project [{project}] does not exist, cloning it from [{repo.ssh_url}]...")
+        if ConfigAlgo.dryrun:
+            continue
         subprocess.check_call(
             [
                 "git",
