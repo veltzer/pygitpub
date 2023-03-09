@@ -14,4 +14,4 @@ author: Mark Veltzer
 
 version: 0.0.41
 
-	Mark Veltzer <mark.veltzer@gmail.com>, Copyright © 2022
+	Mark Veltzer <mark.veltzer@gmail.com>, Copyright © 2022, 2023
