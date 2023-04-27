@@ -1,12 +1,12 @@
 # *pygitpub* project by Mark Veltzer
 
-description: help you work with github
+description: Pygitpub will help you work with github
 
 project website: https://veltzer.github.io/pygitpub
 
 author: Mark Veltzer
 
-version: 0.0.41
+version: 0.0.42
 
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 

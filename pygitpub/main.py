@@ -12,7 +12,7 @@ from pytconf import register_main, config_arg_parse_and_launch, register_endpoin
 
 import github
 from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
-from pygitpub.static import VERSION_STR
+import pygitpub.static
 from pygitpub.utils import delete
 
 
@@ -232,9 +232,9 @@ def workflows_run() -> None:
 
 
 @register_main(
-    main_description="pygitpub will help you work with github",
-    app_name="pygitpub",
-    version=VERSION_STR,
+    main_description=pygitpub.static.DESCRIPTION,
+    app_name=pygitpub.static.APP_NAME,
+    version=pygitpub.static.VERSION_STR,
 )
 def main():
     pylogconf.core.setup()
