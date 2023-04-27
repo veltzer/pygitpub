@@ -44,7 +44,7 @@
 
 <span class="kn">import</span> <span class="nn">github</span>
 <span class="kn">from</span> <span class="nn">pygitpub.configs</span> <span class="kn">import</span> <span class="n">ConfigGithub</span><span class="p">,</span> <span class="n">ConfigOutput</span><span class="p">,</span> <span class="n">ConfigAlgo</span>
-<span class="kn">from</span> <span class="nn">pygitpub.static</span> <span class="kn">import</span> <span class="n">VERSION_STR</span>
+<span class="kn">import</span> <span class="nn">pygitpub.static</span>
 <span class="kn">from</span> <span class="nn">pygitpub.utils</span> <span class="kn">import</span> <span class="n">delete</span>
 
 
@@ -264,9 +264,9 @@
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.main">[docs]</a><span class="nd">@register_main</span><span class="p">(</span>
-    <span class="n">main_description</span><span class="o">=</span><span class="s2">&quot;pygitpub will help you work with github&quot;</span><span class="p">,</span>
-    <span class="n">app_name</span><span class="o">=</span><span class="s2">&quot;pygitpub&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="n">VERSION_STR</span><span class="p">,</span>
+    <span class="n">main_description</span><span class="o">=</span><span class="n">pygitpub</span><span class="o">.</span><span class="n">static</span><span class="o">.</span><span class="n">DESCRIPTION</span><span class="p">,</span>
+    <span class="n">app_name</span><span class="o">=</span><span class="n">pygitpub</span><span class="o">.</span><span class="n">static</span><span class="o">.</span><span class="n">APP_NAME</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="n">pygitpub</span><span class="o">.</span><span class="n">static</span><span class="o">.</span><span class="n">VERSION_STR</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">pylogconf</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>

@@ -1,4 +1,4 @@
-description_short = "help you work with github"
+description_short = "Pygitpub will help you work with github"
 keywords = [
     "github",
     "pygithub",
