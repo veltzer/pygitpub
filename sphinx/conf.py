@@ -9,7 +9,7 @@ project_copyright = '2020, Mark Veltzer'
 author = 'Mark Veltzer'
 import config.version
 version = ".".join(str(x) for x in config.version.tup)
-release = '0.0.1'
+release = ".".join(str(x) for x in config.version.tup)
 
 html_theme_options = {
         "show_powered_by": "false",
