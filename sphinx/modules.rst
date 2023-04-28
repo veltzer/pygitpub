@@ -1,7 +1,7 @@
-|project|
+pygitpub
 ========
 
 .. toctree::
    :maxdepth: 4
 
-   |project|
+   pygitpub
