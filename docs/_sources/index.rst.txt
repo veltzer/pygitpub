@@ -9,8 +9,6 @@ Welcome to |project|'s documentation!
 
    modules
 
-
-
 Indices and tables
 ==================
 
