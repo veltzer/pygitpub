@@ -3,7 +3,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode']
 
 
-project = 'pygitpub'
+import config.project
+project = config.project.name
 project_copyright = '2020, Mark Veltzer'
 author = 'Mark Veltzer'
 import config.version
