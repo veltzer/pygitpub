@@ -27,4 +27,4 @@ def delete(workflow_run):
 
 
 def get_all_git_repos() -> set[str]:
-    return {os.path.dirname(x) for x in glob.glob("*/*/*.git")}
+    return {os.path.dirname(x) for x in glob.glob("*/*/.git")}
