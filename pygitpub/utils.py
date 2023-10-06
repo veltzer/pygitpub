@@ -1,5 +1,7 @@
 import logging
 import os
+import os.path
+import glob
 
 from pygitpub import LOGGER_NAME
 
@@ -22,3 +24,7 @@ def delete(workflow_run):
     # pylint: disable=protected-access
     status, _, _ = workflow_run._requester.requestJson("DELETE", workflow_run.url)
     return status == 204
+
+
+def get_all_git_repos() -> set[str]:
+    return {os.path.dirname(x) for x in glob.glob("*/*/*.git")}
