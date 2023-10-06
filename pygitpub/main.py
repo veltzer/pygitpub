@@ -193,8 +193,11 @@ def pull_all() -> None:
 )
 def clone_all() -> None:
     for repo in yield_repos():
-        folder = repo.name
-        project = folder
+        owner = repo.owner.login
+        if not os.path.isdir(owner):
+            os.mkdir(owner)
+        project = repo.name
+        folder = os.path.join(owner, repo.name)
         print(f"considering [{project}] from [{repo.ssh_url}]...")
         if os.path.isfile(folder):
             print(f"skipping [{folder}] as it is not to be cloned...")
@@ -210,7 +213,8 @@ def clone_all() -> None:
                 "git",
                 "clone",
                 repo.ssh_url,
-            ]
+            ],
+            cwd=owner,
         )
 
 
