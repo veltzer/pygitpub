@@ -198,16 +198,16 @@ def clone_all() -> None:
             os.mkdir(owner)
         project = repo.name
         folder = os.path.join(owner, repo.name)
-        print(f"considering [{project}] from [{repo.ssh_url}]...")
+        # print(f"considering [{project}] from [{repo.ssh_url}]...")
         if os.path.isfile(folder):
-            print(f"skipping [{folder}] as it is not to be cloned...")
+            # print(f"skipping [{folder}] as it is not to be cloned...")
             continue
         if os.path.isdir(folder):
-            print(f"skipping [{folder}] as it is already cloned...")
+            # print(f"skipping [{folder}] as it is already cloned...")
             continue
-        print(f"project [{project}] does not exist, cloning it from [{repo.ssh_url}]...")
         if ConfigAlgo.dryrun:
             continue
+        print(f"cloning [{owner}:{project}] from [{repo.ssh_url}] to [{folder}]")
         subprocess.check_call(
             [
                 "git",
@@ -215,6 +215,8 @@ def clone_all() -> None:
                 repo.ssh_url,
             ],
             cwd=owner,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
 
 
