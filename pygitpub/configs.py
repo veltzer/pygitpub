@@ -43,6 +43,10 @@ class ConfigAlgo(Config):
         help_string="Only include repos owned by this owner (None for dont mind)",
         default=None,
     )
+    show_extra = ParamCreator.create_bool(
+        help_string="Show extra git repos lygin around?",
+        default=True,
+    )
 
 
 class ConfigOutput(Config):

@@ -13,7 +13,7 @@ from pytconf import register_main, config_arg_parse_and_launch, register_endpoin
 import github
 from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
 import pygitpub.static
-from pygitpub.utils import delete
+from pygitpub.utils import delete, get_all_git_repos
 
 
 def yield_repos():
@@ -189,15 +189,16 @@ def pull_all() -> None:
     description="Pull all projects from github",
     configs=[
         ConfigGithub,
+        ConfigAlgo,
     ],
 )
 def clone_all() -> None:
+    all_repo_folders = set()
     for repo in yield_repos():
         owner = repo.owner.login
-        if not os.path.isdir(owner):
-            os.mkdir(owner)
         project = repo.name
         folder = os.path.join(owner, repo.name)
+        all_repo_folders.add(folder)
         # print(f"considering [{project}] from [{repo.ssh_url}]...")
         if os.path.isfile(folder):
             # print(f"skipping [{folder}] as it is not to be cloned...")
@@ -208,6 +209,8 @@ def clone_all() -> None:
         if ConfigAlgo.dryrun:
             continue
         print(f"cloning [{owner}:{project}] from [{repo.ssh_url}] to [{folder}]")
+        if not os.path.isdir(owner):
+            os.mkdir(owner)
         subprocess.check_call(
             [
                 "git",
@@ -218,6 +221,13 @@ def clone_all() -> None:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+    if ConfigAlgo.show_extra:
+        disk_repos = get_all_git_repos()
+        extra_repos = disk_repos - all_repo_folders
+        if extra_repos:
+            print("extra repos follow:")
+            for extra_repo in extra_repos:
+                print(extra_repo)
 
 
 @register_endpoint(
