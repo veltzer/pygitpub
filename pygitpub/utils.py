@@ -1,4 +1,5 @@
 import logging
+from typing import Set
 import os
 import os.path
 import glob
@@ -26,5 +27,5 @@ def delete(workflow_run):
     return status == 204
 
 
-def get_all_git_repos() -> set[str]:
+def get_all_git_repos() -> Set[str]:
     return {os.path.dirname(x) for x in glob.glob("*/*/.git")}
