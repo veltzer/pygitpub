@@ -33,7 +33,7 @@ class ConfigAlgo(Config):
     )
     fork = ParamCreator.create_bool(
         help_string="Include forks?",
-        default=False,
+        default=True,
     )
     dryrun = ParamCreator.create_bool(
         help_string="Do a try run?",
