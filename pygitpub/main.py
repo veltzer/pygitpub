@@ -151,6 +151,25 @@ def runs_show_failing() -> None:
 
 
 @register_endpoint(
+    description="Show all runs which are not success at last run",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def runs_show_not_success() -> None:
+    for repo in yield_repos():
+        for workflow in repo.get_workflows():
+            for run in workflow.get_runs():
+                last_run = run
+                break
+            else:
+                continue
+            if last_run.conclusion != "success":
+                print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
+
+
+@register_endpoint(
     description="Pull all projects from github",
     configs=[
         ConfigGithub,
