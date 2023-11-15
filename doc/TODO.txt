@@ -1,4 +1,6 @@
 - improve the method 'yield_repos' to only make one function call and not two.
-- allow to cleanup runs which were trigger by the user and not by a commit.
+- add a "check description" and "fix description" to check the description on github is just
+	like the description in the config/project.py
+- allow to cleanup runs which were triggered by the user and not by a commit.
 	(runs which you dont see a branch next to when you look at the "actions"
 	page at github)
