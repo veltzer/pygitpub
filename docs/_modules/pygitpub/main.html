@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pygitpub.main &#8212; pygitpub 0.0.47 documentation</title>
+    <title>pygitpub.main &#8212; pygitpub Documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=4f649999" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=039e1c02" />
     <script src="../../_static/documentation_options.js?v=4f34e5f2"></script>
@@ -89,6 +89,22 @@
             <span class="n">homepage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">html_url</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patching [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
             <span class="n">repo</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">homepage</span><span class="o">=</span><span class="n">homepage</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="show_website">
+<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.show_website">[docs]</a>
+<span class="nd">@register_endpoint</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show name and website for each repo&quot;</span><span class="p">,</span>
+    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">show_website</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">html_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
 
 
 
