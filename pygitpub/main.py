@@ -56,6 +56,19 @@ def fix_website() -> None:
 
 
 @register_endpoint(
+    description="Show name and website for each repo",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def show_website() -> None:
+    for repo in yield_repos():
+        print(f"{repo.name} {repo.html_url}")
+
+
+
+@register_endpoint(
     description="List repos",
     configs=[
         ConfigGithub,
