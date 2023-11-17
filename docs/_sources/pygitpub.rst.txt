@@ -28,14 +28,6 @@ pygitpub.static module
    :undoc-members:
    :show-inheritance:
 
-pygitpub.utils module
----------------------
-
-.. automodule:: pygitpub.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 import json
+import importlib
 
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
@@ -13,7 +14,8 @@ from pytconf import register_main, config_arg_parse_and_launch, register_endpoin
 import github
 from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
 import pygitpub.static
-from pygitpub.utils import delete, get_all_git_repos
+from pygitpub.utils.misc import delete, get_all_git_repos
+from pygitpub.utils.importlib import module_exists
 
 
 def yield_repos():
@@ -41,6 +43,30 @@ def yield_repos():
 
 
 @register_endpoint(
+    description="Fix the metadata of the project on github to match the source code",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def fix_metadata() -> None:
+    orig_folder = os.getcwd()
+    for repo in yield_repos():
+        owner = repo.owner.login
+        folder = os.path.join(owner, repo.name)
+        os.chdir(folder)
+        module = "config.project"
+        if module_exists(module):
+            mod = importlib.import_module(module)
+            description_short = getattr(mod, "description_short")
+            print(f"description_short is {description_short}")
+            print(f"repo.description is {repo.description}")
+        else:
+            print(f"no {module}")
+        os.chdir(orig_folder)
+
+
+@register_endpoint(
     description="Set the correct website for the project on all repos where it is not correct",
     configs=[
         ConfigGithub,
@@ -65,7 +91,6 @@ def fix_website() -> None:
 def show_website() -> None:
     for repo in yield_repos():
         print(f"{repo.name} {repo.html_url}")
-
 
 
 @register_endpoint(
@@ -189,9 +214,11 @@ def runs_show_not_success() -> None:
     ],
 )
 def pull_all() -> None:
+    orig_folder = os.getcwd()
     for repo in yield_repos():
-        folder = repo.name
-        project = folder
+        owner = repo.owner.login
+        project = repo.name
+        folder = os.path.join(owner, repo.name)
         if os.path.isdir(folder):
             if not os.path.isfile(os.path.join(folder, ".skip")):
                 print(f"project [{project}] exists, pulling it...")
@@ -203,7 +230,7 @@ def pull_all() -> None:
                         # '--tags',
                     ]
                 )
-                os.chdir("..")
+                os.chdir(orig_folder)
             else:
                 print(f"project [{project}] exists, skipping it because of .skip file...")
         else:
