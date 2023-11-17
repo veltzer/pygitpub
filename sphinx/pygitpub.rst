@@ -1,6 +1,14 @@
 pygitpub package
 ================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pygitpub.utils
+
 Submodules
 ----------
 

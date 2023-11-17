@@ -12,6 +12,7 @@ setuptools.setup(
     version="0.0.48",
     packages=[
         "pygitpub",
+        "pygitpub.utils",
     ],
     # from here all is optional
     description="Pygitpub will help you work with github",
