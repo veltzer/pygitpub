@@ -48,7 +48,7 @@ def yield_repos():
         ConfigAlgo,
     ],
 )
-def check_metadata() -> None:
+def fix_metadata() -> None:
     orig_folder = os.getcwd()
     for repo in yield_repos():
         owner = repo.owner.login
@@ -70,6 +70,7 @@ def check_metadata() -> None:
             print(f"in {folder}...")
             print(f"description_short is [{description_short}]")
             print(f"repo.description is [{repo.description}]")
+            repo.edit(description=description_short)
         os.chdir(orig_folder)
 
 
