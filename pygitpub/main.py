@@ -57,6 +57,7 @@ def fix_metadata() -> None:
             # print(f"folder [{folder}] does not exist, continuing...")
             continue
         os.chdir(folder)
+        # print(f"doing [{folder}]...")
         file_path = "config/project.py"
         if not os.path.isfile(file_path):
             os.chdir(orig_folder)
@@ -71,6 +72,16 @@ def fix_metadata() -> None:
             print(f"description_short is [{description_short}]")
             print(f"repo.description is [{repo.description}]")
             repo.edit(description=description_short)
+        if not hasattr(mod, "keywords"):
+            print(f"{folder} no keywords")
+            os.chdir(orig_folder)
+            continue
+        keywords = getattr(mod, "keywords")
+        if set(keywords) != set(repo.get_topics()):
+            print(f"in {folder}...")
+            print(f"keywords is [{keywords}]")
+            print(f"repo.get_topics() is [{repo.get_topics()}]")
+            repo.replace_topics(keywords)
         os.chdir(orig_folder)
 
 
