@@ -28,4 +28,7 @@ def delete(workflow_run):
 
 
 def get_all_git_repos() -> Set[str]:
+    """ we use */*/.git here with recursive=False (which is the default)
+    because otherwise we would find submodules too
+    """
     return {os.path.dirname(x) for x in glob.glob("*/*/.git")}
