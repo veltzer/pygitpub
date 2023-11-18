@@ -6,7 +6,6 @@ import os
 import subprocess
 import sys
 import json
-import importlib
 
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
@@ -15,7 +14,7 @@ import github
 from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
 import pygitpub.static
 from pygitpub.utils.misc import delete, get_all_git_repos
-from pygitpub.utils.importlib import module_exists
+from pygitpub.utils.importlib import import_file
 
 
 def yield_repos():
@@ -54,15 +53,22 @@ def fix_metadata() -> None:
     for repo in yield_repos():
         owner = repo.owner.login
         folder = os.path.join(owner, repo.name)
+        if not os.path.isdir(folder):
+            print(f"folder [{folder}] does not exist, continuing...")
+            continue
         os.chdir(folder)
-        module = "config.project"
-        if module_exists(module):
-            mod = importlib.import_module(module)
-            description_short = getattr(mod, "description_short")
-            print(f"description_short is {description_short}")
-            print(f"repo.description is {repo.description}")
-        else:
-            print(f"no {module}")
+        print(f"in {folder}...")
+        file_path = "config/project.py"
+        if not os.path.isfile(file_path):
+            os.chdir(orig_folder)
+            continue
+        mod = import_file(file_path)
+        if not hasattr(mod, "description_short"):
+            os.chdir(orig_folder)
+            continue
+        description_short = getattr(mod, "description_short")
+        print(f"description_short is [{description_short}]")
+        print(f"repo.description is [{repo.description}]")
         os.chdir(orig_folder)
 
 
