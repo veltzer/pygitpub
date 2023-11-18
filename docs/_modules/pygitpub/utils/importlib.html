@@ -7,7 +7,7 @@
     <title>pygitpub.utils.importlib &#8212; pygitpub Documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=4f649999" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=039e1c02" />
-    <script src="../../../_static/documentation_options.js?v=a72e4630"></script>
+    <script src="../../../_static/documentation_options.js?v=0356c229"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -29,15 +29,25 @@
           <div class="body" role="main">
             
   <h1>Source code for pygitpub.utils.importlib</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">importlib.util</span> <span class="kn">import</span> <span class="n">find_spec</span>
+<span></span><span class="kn">import</span> <span class="nn">importlib.util</span>
 
 
 <div class="viewcode-block" id="module_exists">
 <a class="viewcode-back" href="../../../pygitpub.utils.html#pygitpub.utils.importlib.module_exists">[docs]</a>
 <span class="k">def</span> <span class="nf">module_exists</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; return if a module exists or not &quot;&quot;&quot;</span>
-    <span class="n">spec</span> <span class="o">=</span> <span class="n">find_spec</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="import_file">
+<a class="viewcode-back" href="../../../pygitpub.utils.html#pygitpub.utils.importlib.import_file">[docs]</a>
+<span class="k">def</span> <span class="nf">import_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+    <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mod</span></div>
 
 </pre></div>
 
