@@ -48,16 +48,15 @@ def yield_repos():
         ConfigAlgo,
     ],
 )
-def fix_metadata() -> None:
+def check_metadata() -> None:
     orig_folder = os.getcwd()
     for repo in yield_repos():
         owner = repo.owner.login
         folder = os.path.join(owner, repo.name)
         if not os.path.isdir(folder):
-            print(f"folder [{folder}] does not exist, continuing...")
+            # print(f"folder [{folder}] does not exist, continuing...")
             continue
         os.chdir(folder)
-        print(f"in {folder}...")
         file_path = "config/project.py"
         if not os.path.isfile(file_path):
             os.chdir(orig_folder)
@@ -67,8 +66,10 @@ def fix_metadata() -> None:
             os.chdir(orig_folder)
             continue
         description_short = getattr(mod, "description_short")
-        print(f"description_short is [{description_short}]")
-        print(f"repo.description is [{repo.description}]")
+        if description_short != repo.description:
+            print(f"in {folder}...")
+            print(f"description_short is [{description_short}]")
+            print(f"repo.description is [{repo.description}]")
         os.chdir(orig_folder)
 
 
