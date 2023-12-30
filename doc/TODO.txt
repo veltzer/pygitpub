@@ -1,3 +1,4 @@
+- add a command "workflow_run_failing"
 - improve the method 'yield_repos' to only make one function call and not two.
 - add a "check description" and "fix description" to check the description on github is just
 	like the description in the config/project.py
