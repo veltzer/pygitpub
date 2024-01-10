@@ -4,11 +4,12 @@ from typing import List
 console_scripts: List[str] = [
     "pygitpub=pygitpub.main:main",
 ]
-config_requires: List[str] = [
-    "pyyaml",
-]
 dev_requires: List[str] = [
     "pypitools",
+]
+config_requires: List[str] = [
+    "pyyaml",
+    "pyclassifiers",
 ]
 install_requires: List[str] = [
     "pytconf",
@@ -16,10 +17,8 @@ install_requires: List[str] = [
     "PyGithub",
 ]
 make_requires: List[str] = [
-    "pyclassifiers",
     "pymakehelper",
     "pydmt",
-    "sphinx",
 ]
 test_requires: List[str] = [
     "pylint",
