@@ -1,0 +1,13 @@
+# THIS IS AN AUTO-GENERATED FILE. DO NOT EDIT!
+pyyaml
+pyclassifiers
+pytconf
+pylogconf
+PyGithub
+pymakehelper
+pydmt
+pylint
+pytest
+pytest-cov
+flake8
+mypy
