@@ -147,13 +147,16 @@ def runs_cleanup() -> None:
                 # if it's a pages build delete it unless it's in mid work (run.conclusion is None)
                 if workflow.name == "pages-build-deployment" and run.conclusion is not None:
                     delete_it = True
+                # if it's not on the master branch, delete it
+                if run.head_branch != "master":
+                    delete_it = True
                 # if it's not a paged build and it failed then delete it
                 if workflow.name != "pages-build-deployment" and run.conclusion == "failure":
                     delete_it = True
                 if existing >= 4:
                     delete_it = True
                 if delete_it:
-                    print(f"deleting {repo.name} {workflow.name} {run.conclusion} {run.url}")
+                    print(f"deleting {repo.name} {workflow.name} {run.head_branch} {run.conclusion} {run.url}")
                     delete(run)
                 else:
                     existing += 1
