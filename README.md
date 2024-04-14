@@ -6,7 +6,7 @@ project website: https://veltzer.github.io/pygitpub
 
 author: Mark Veltzer
 
-version: 0.0.51
+version: 0.0.52
 
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
