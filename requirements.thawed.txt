@@ -4,6 +4,7 @@ pyclassifiers
 pytconf
 pylogconf
 PyGithub
+pyapikey
 pymakehelper
 pydmt
 pylint

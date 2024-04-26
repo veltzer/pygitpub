@@ -36,6 +36,7 @@ setuptools.setup(
         "pytconf",
         "pylogconf",
         "PyGithub",
+        "pyapikey",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

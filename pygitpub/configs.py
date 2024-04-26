@@ -11,11 +11,8 @@ class ConfigGithub(Config):
     username = ParamCreator.create_str(
         help_string="What is your github username?",
     )
-    token = ParamCreator.create_str(
-        help_string="What is your github token?",
-    )
-    token_name = ParamCreator.create_str(
-        help_string="What is the name of the token on github?",
+    apikey = ParamCreator.create_str(
+        help_string="What is the name of your apikey (see pyapikey)?",
     )
 
 

@@ -15,6 +15,7 @@ install_requires: List[str] = [
     "pytconf",
     "pylogconf",
     "PyGithub",
+    "pyapikey",
 ]
 build_requires: List[str] = [
     "pymakehelper",
