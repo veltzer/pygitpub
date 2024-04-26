@@ -11,6 +11,7 @@ import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
 
 import github
+import pyapikey
 from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
 import pygitpub.static
 from pygitpub.utils.misc import delete, get_all_git_repos
@@ -18,7 +19,8 @@ from pygitpub.utils.importlib import import_file
 
 
 def yield_repos():
-    g = github.Github(login_or_token=ConfigGithub.token)
+    apikey = pyapikey.get_key(ConfigGithub.apikey)
+    g = github.Github(login_or_token=apikey)
     for repo in g.get_user().get_repos():
         reason = "no reason set"
         skip = False
