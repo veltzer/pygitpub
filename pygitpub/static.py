@@ -1,5 +1,5 @@
 """ version which can be consumed from within the module """
-VERSION_STR = "0.0.53"
+VERSION_STR = "0.0.54"
 DESCRIPTION = "Pygitpub will help you work with github"
 APP_NAME = "pygitpub"
 LOGGER_NAME = "pygitpub"

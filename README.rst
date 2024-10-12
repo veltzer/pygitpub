@@ -12,6 +12,6 @@ project website: https://veltzer.github.io/pygitpub
 
 author: Mark Veltzer
 
-version: 0.0.53
+version: 0.0.54
 
 	Mark Veltzer <mark.veltzer@gmail.com>, Copyright © 2022, 2023, 2024
