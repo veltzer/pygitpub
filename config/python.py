@@ -6,7 +6,6 @@ console_scripts: List[str] = [
     "pygitpub=pygitpub.main:main",
 ]
 dev_requires: List[str] = [
-    "pypitools",
 ]
 config_requires: List[str] = [
     "pyyaml",
@@ -21,6 +20,7 @@ install_requires: List[str] = [
 build_requires: List[str] = [
     "pymakehelper",
     "pydmt",
+    "pypitools",
 ]
 test_requires: List[str] = [
     "pylint",
