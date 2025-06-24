@@ -128,7 +128,7 @@ def repos_show() -> None:
 
 
 @register_endpoint(
-    description="Show github pages sites",
+    description="Show github homepage for github pages sites",
     configs=[
         ConfigGithub,
         ConfigAlgo,
@@ -138,6 +138,18 @@ def repos_show_pages() -> None:
     for repo in yield_repos():
         if repo.has_pages:
             print(f"{repo.name}: {repo.homepage}")
+
+
+@register_endpoint(
+    description="Show github homepage",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def repos_show_homepage() -> None:
+    for repo in yield_repos():
+        print(f"{repo.name}: {repo.homepage}")
 
 
 @register_endpoint(
