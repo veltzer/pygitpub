@@ -94,24 +94,50 @@ def fix_metadata() -> None:
         ConfigAlgo,
     ],
 )
-def fix_website() -> None:
+def homepage_fix() -> None:
     for repo in yield_repos():
-        if repo.homepage == "" or repo.homepage is None:
-            homepage = f"{repo.html_url}"
-            print(f"patching [{repo.name}]...")
-            repo.edit(repo.name, homepage=homepage)
+        if repo.has_pages:
+            right_homepage = f"https://{ConfigGithub.username}.github.io/{repo.name}/"
+            if repo.homepage != right_homepage:
+                print(f"{repo.name} is wrong!")
+                print(f"homepage: {repo.homepage}")
+                print(f"right_homepage: {right_homepage}")
+                print(f"patching [{repo.name}]...")
+                repo.edit(repo.name, homepage=right_homepage)
+        else:
+            right_homepage = f"https://github.com/{ConfigGithub.username}/{repo.name}/"
+            if repo.homepage != right_homepage:
+                print(f"{repo.name} is wrong!")
+                print(f"homepage: {repo.homepage}")
+                print(f"right_homepage: {right_homepage}")
+                print(f"patching [{repo.name}]...")
+                repo.edit(repo.name, homepage=right_homepage)
 
 
 @register_endpoint(
-    description="Show name and website for each repo",
+    description="Show all data about repositories as JSON",
     configs=[
         ConfigGithub,
         ConfigAlgo,
     ],
 )
-def show_website() -> None:
+def repos_show() -> None:
     for repo in yield_repos():
-        print(f"{repo.name} {repo.html_url}")
+        # pylint: disable=protected-access
+        json.dump(repo._rawData, fp=sys.stdout, indent=4)
+
+
+@register_endpoint(
+    description="Show github pages sites",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def repos_show_pages() -> None:
+    for repo in yield_repos():
+        if repo.has_pages:
+            print(f"{repo.name}: {repo.homepage}")
 
 
 @register_endpoint(
