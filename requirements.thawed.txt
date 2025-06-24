@@ -7,6 +7,7 @@ PyGithub
 pyapikey
 pymakehelper
 pydmt
+pypitools
 pylint
 pytest
 pytest-cov
