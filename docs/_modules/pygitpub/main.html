@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
-    <script src="../../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -126,8 +126,8 @@
 
 
 
-<div class="viewcode-block" id="fix_website">
-<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.fix_website">[docs]</a>
+<div class="viewcode-block" id="homepage_fix">
+<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.homepage_fix">[docs]</a>
 <span class="nd">@register_endpoint</span><span class="p">(</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set the correct website for the project on all repos where it is not correct&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
@@ -135,27 +135,56 @@
         <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">fix_website</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">homepage_fix</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">homepage</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">repo</span><span class="o">.</span><span class="n">homepage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">homepage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">html_url</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patching [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
-            <span class="n">repo</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">homepage</span><span class="o">=</span><span class="n">homepage</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">has_pages</span><span class="p">:</span>
+            <span class="n">right_homepage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://</span><span class="si">{</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">.github.io/</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">homepage</span> <span class="o">!=</span> <span class="n">right_homepage</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is wrong!&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;homepage: </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">homepage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;right_homepage: </span><span class="si">{</span><span class="n">right_homepage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patching [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
+                <span class="n">repo</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">homepage</span><span class="o">=</span><span class="n">right_homepage</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">right_homepage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://github.com/</span><span class="si">{</span><span class="n">ConfigGithub</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">homepage</span> <span class="o">!=</span> <span class="n">right_homepage</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is wrong!&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;homepage: </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">homepage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;right_homepage: </span><span class="si">{</span><span class="n">right_homepage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patching [</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">]...&quot;</span><span class="p">)</span>
+                <span class="n">repo</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">homepage</span><span class="o">=</span><span class="n">right_homepage</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="show_website">
-<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.show_website">[docs]</a>
+<div class="viewcode-block" id="repos_show">
+<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_show">[docs]</a>
 <span class="nd">@register_endpoint</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show name and website for each repo&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all data about repositories as JSON&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
         <span class="n">ConfigGithub</span><span class="p">,</span>
         <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">show_website</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repos_show</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">html_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">_rawData</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="repos_show_pages">
+<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_show_pages">[docs]</a>
+<span class="nd">@register_endpoint</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show github pages sites&quot;</span><span class="p">,</span>
+    <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">ConfigGithub</span><span class="p">,</span>
+        <span class="n">ConfigAlgo</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repos_show_pages</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">has_pages</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">repo</span><span class="o">.</span><span class="n">homepage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
