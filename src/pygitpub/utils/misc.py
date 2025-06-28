@@ -1,7 +1,6 @@
 """ misc.py """
 
 import logging
-from typing import Set
 import os
 import os.path
 import glob
