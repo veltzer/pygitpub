@@ -1,8 +1,8 @@
 """ python deps for this project """
 
-console_scripts: list[str] = [
-    "pygitpub=pygitpub.main:main",
-]
+scripts: dict[str,str] = {
+    "pygitpub": "pygitpub.main:main",
+}
 
 config_requires: list[str] = [
     "pyclassifiers",
