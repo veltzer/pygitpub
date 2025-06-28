@@ -29,7 +29,7 @@ def delete(workflow_run):
     return status == 204
 
 
-def get_all_git_repos() -> Set[str]:
+def get_all_git_repos() -> set[str]:
     """ we use */*/.git here with recursive=False (which is the default)
     because otherwise we would find submodules too
     """
