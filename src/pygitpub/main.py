@@ -121,7 +121,7 @@ def homepage_fix() -> None:
         ConfigAlgo,
     ],
 )
-def repos_show() -> None:
+def repos_json() -> None:
     for repo in yield_repos():
         # pylint: disable=protected-access
         json.dump(repo._rawData, fp=sys.stdout, indent=4)

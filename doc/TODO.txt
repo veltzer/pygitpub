@@ -1,4 +1,7 @@
 - add a command "workflow_run_failing"
+- add a command which checks that each repository that has a 'docs' subfolder also
+	has github pages setup to the docs folder and vice versa: every repository
+	on github which has github pages setup has a "docs" folder.
 - improve the method 'yield_repos' to only make one function call and not two.
 - add a "check description" and "fix description" to check the description on github is just
 	like the description in the config/project.py
