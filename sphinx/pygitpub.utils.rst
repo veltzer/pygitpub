@@ -9,21 +9,21 @@ pygitpub.utils.importlib module
 
 .. automodule:: pygitpub.utils.importlib
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 pygitpub.utils.misc module
 --------------------------
 
 .. automodule:: pygitpub.utils.misc
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: pygitpub.utils
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
