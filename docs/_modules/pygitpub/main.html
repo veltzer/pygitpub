@@ -156,8 +156,8 @@
 
 
 
-<div class="viewcode-block" id="repos_show">
-<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_show">[docs]</a>
+<div class="viewcode-block" id="repos_json">
+<a class="viewcode-back" href="../../pygitpub.html#pygitpub.main.repos_json">[docs]</a>
 <span class="nd">@register_endpoint</span><span class="p">(</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Show all data about repositories as JSON&quot;</span><span class="p">,</span>
     <span class="n">configs</span><span class="o">=</span><span class="p">[</span>
@@ -165,7 +165,7 @@
         <span class="n">ConfigAlgo</span><span class="p">,</span>
     <span class="p">],</span>
 <span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">repos_show</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repos_json</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">yield_repos</span><span class="p">():</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">_rawData</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
