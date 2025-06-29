@@ -1,8 +1,10 @@
 # THIS IS AN AUTO-GENERATED FILE. DO NOT EDIT!
 PyGithub
+hatch
 mypy
 pyapikey
 pyclassifiers
+pycmdtools
 pydmt
 pylint
 pylogconf
