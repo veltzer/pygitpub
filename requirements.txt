@@ -34,7 +34,7 @@ pyapikey==0.0.12
 pyclassifiers==0.0.19
 pycodestyle==2.13.0
 pycparser==2.22
-pydmt==0.3.19
+pydmt==0.3.22
 pyfakeuse==0.0.9
 pyflakes==3.3.2
 PyGithub==2.6.1
