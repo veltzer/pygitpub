@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pygitpub package &#8212; pygitpub Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pygitpub.utils package" href="pygitpub.utils.html" />
+    <link rel="prev" title="pygitpub" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pygitpub-package">
+<h1>pygitpub package<a class="headerlink" href="#pygitpub-package" title="Link to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pygitpub.utils.html">pygitpub.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pygitpub.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pygitpub.utils.html#module-pygitpub.utils.importlib">pygitpub.utils.importlib module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pygitpub.utils.html#pygitpub.utils.importlib.import_file"><code class="docutils literal notranslate"><span class="pre">import_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pygitpub.utils.html#pygitpub.utils.importlib.module_exists"><code class="docutils literal notranslate"><span class="pre">module_exists()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pygitpub.utils.html#module-pygitpub.utils.misc">pygitpub.utils.misc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pygitpub.utils.html#pygitpub.utils.misc.delete"><code class="docutils literal notranslate"><span class="pre">delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pygitpub.utils.html#pygitpub.utils.misc.get_all_git_repos"><code class="docutils literal notranslate"><span class="pre">get_all_git_repos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pygitpub.utils.html#pygitpub.utils.misc.get_logger"><code class="docutils literal notranslate"><span class="pre">get_logger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pygitpub.utils.html#pygitpub.utils.misc.get_number_of_files"><code class="docutils literal notranslate"><span class="pre">get_number_of_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pygitpub.utils.html#module-pygitpub.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-pygitpub.configs">
+<span id="pygitpub-configs-module"></span><h2>pygitpub.configs module<a class="headerlink" href="#module-pygitpub.configs" title="Link to this heading">¶</a></h2>
+<p>All configurations for pygitpub</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigAlgo</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigAlgo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigAlgo" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></p>
+<p>Parameters to control the algorithm</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.dryrun">
+<span class="sig-name descname"><span class="pre">dryrun</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.dryrun" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.fork">
+<span class="sig-name descname"><span class="pre">fork</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.fork" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.owner_login">
+<span class="sig-name descname"><span class="pre">owner_login</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.owner_login" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.private">
+<span class="sig-name descname"><span class="pre">private</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.private" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.public">
+<span class="sig-name descname"><span class="pre">public</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.public" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigAlgo.show_extra">
+<span class="sig-name descname"><span class="pre">show_extra</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pygitpub.configs.ConfigAlgo.show_extra" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigGithub">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigGithub</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigGithub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigGithub" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></p>
+<p>Paramters for your github account</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigGithub.apikey">
+<span class="sig-name descname"><span class="pre">apikey</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pytconf.param.Unique</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#pygitpub.configs.ConfigGithub.apikey" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigGithub.username">
+<span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pytconf.param.Unique</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#pygitpub.configs.ConfigGithub.username" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pygitpub.configs.</span></span><span class="sig-name descname"><span class="pre">ConfigOutput</span></span><a class="reference internal" href="_modules/pygitpub/configs.html#ConfigOutput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.configs.ConfigOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Config</span></code></p>
+<p>Parameters to control output</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pygitpub.configs.ConfigOutput.verbose">
+<span class="sig-name descname"><span class="pre">verbose</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#pygitpub.configs.ConfigOutput.verbose" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pygitpub.main">
+<span id="pygitpub-main-module"></span><h2>pygitpub.main module<a class="headerlink" href="#module-pygitpub.main" title="Link to this heading">¶</a></h2>
+<p>main entry point to the program</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.clone_all">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">clone_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#clone_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.clone_all" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.fix_metadata">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">fix_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#fix_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.fix_metadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.homepage_fix">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">homepage_fix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#homepage_fix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.homepage_fix" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.main">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pygitpub/main.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.pull_all">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">pull_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#pull_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.pull_all" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.repos_json">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">repos_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#repos_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.repos_json" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.repos_list">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">repos_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#repos_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.repos_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.repos_show_homepage">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">repos_show_homepage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#repos_show_homepage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.repos_show_homepage" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.repos_show_pages">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">repos_show_pages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#repos_show_pages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.repos_show_pages" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.runs_cleanup">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">runs_cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#runs_cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.runs_cleanup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.runs_show">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">runs_show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#runs_show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.runs_show" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.runs_show_failing">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">runs_show_failing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#runs_show_failing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.runs_show_failing" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.runs_show_not_success">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">runs_show_not_success</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#runs_show_not_success"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.runs_show_not_success" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.runs_show_running">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">runs_show_running</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#runs_show_running"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.runs_show_running" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.workflows_run">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">workflows_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pygitpub/main.html#workflows_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.workflows_run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pygitpub.main.yield_repos">
+<span class="sig-prename descclassname"><span class="pre">pygitpub.main.</span></span><span class="sig-name descname"><span class="pre">yield_repos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pygitpub/main.html#yield_repos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pygitpub.main.yield_repos" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-pygitpub.static">
+<span id="pygitpub-static-module"></span><h2>pygitpub.static module<a class="headerlink" href="#module-pygitpub.static" title="Link to this heading">¶</a></h2>
+<p>version which can be consumed from within the module</p>
+</section>
+<section id="module-pygitpub">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pygitpub" title="Link to this heading">¶</a></h2>
+<p>Initialize the module</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pygitpub</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pygitpub</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pygitpub package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">pygitpub</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">pygitpub</a></li>
+      <li>Next: <a href="pygitpub.utils.html" title="next chapter">pygitpub.utils package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2022, 2023, 2024, 2025 Mark Veltzer.
+      
+      |
+      <a href="_sources/pygitpub.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
