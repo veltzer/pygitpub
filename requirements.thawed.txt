@@ -3,6 +3,7 @@ PyGithub
 hatch
 mypy
 pyapikey
+pyclassifiers
 pycmdtools
 pydmt
 pylint

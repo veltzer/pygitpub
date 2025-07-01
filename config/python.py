@@ -9,18 +9,8 @@ install_requires: list[str] = [
     "pyapikey",
     "pyyaml",
 ]
-build_requires: list[str] = [
-    "hatch",
-    "pydmt",
-    "pymakehelper",
-    "pycmdtools",
-]
-test_requires: list[str] = [
-    "pylint",
-    "pytest",
-    "mypy",
-    "ruff",
-]
+build_requires: list[str] = config.shared.PBUILD
+test_requires: list[str] = config.shared.PTEST
 requires = install_requires + build_requires + test_requires
 
 dcripts: dict[str,str] = {
