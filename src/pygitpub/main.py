@@ -184,13 +184,13 @@ def runs_cleanup() -> None:
                 if ConfigOutput.verbose:
                     print(f"inspecting {repo.name} {workflow.name} {run.conclusion}")
                 delete_it = False
-                # if it's a pages build delete it unless it's in mid work (run.conclusion is None)
+                # if its a pages build delete it unless its in mid work (run.conclusion is None)
                 if workflow.name == "pages-build-deployment" and run.conclusion is not None:
                     delete_it = True
-                # if it's not on the master branch, delete it
+                # if its not on the master branch, delete it
                 if run.head_branch != "master":
                     delete_it = True
-                # if it's not a paged build and it failed then delete it
+                # if its not a paged build and it failed then delete it
                 if workflow.name != "pages-build-deployment" and run.conclusion == "failure":
                     delete_it = True
                 if existing >= 4:
@@ -289,7 +289,7 @@ def pull_all() -> None:
                     [
                         "git",
                         "pull",
-                        # '--tags',
+                        # "--tags",
                     ]
                 )
                 os.chdir(orig_folder)
@@ -362,7 +362,7 @@ def clone_all() -> None:
 def workflows_run() -> None:
     for repo in yield_repos():
         for workflow in repo.get_workflows():
-            print(f"{repo.name}: {workflow.name}...", end='')
+            print(f"{repo.name}: {workflow.name}...", end="")
             sys.stdout.flush()
             ret = workflow.create_dispatch(ref="master")
             print(f"{ret}")
@@ -378,5 +378,5 @@ def main():
     config_arg_parse_and_launch()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
