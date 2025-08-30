@@ -41,7 +41,7 @@ class ConfigAlgo(Config):
         default=None,
     )
     show_extra = ParamCreator.create_bool(
-        help_string="Show extra git repos lygin around?",
+        help_string="Show extra git repos lying around?",
         default=True,
     )
 
