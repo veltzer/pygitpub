@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pygitpub"
-version = "0.0.57"
+version = "0.0.58"
 requires-python = ">=3.12"
 authors = [
 	{ name = "Mark Veltzer", email = "mark.veltzer@gmail.com" }
@@ -45,6 +45,8 @@ dependencies = [
 "Download" = "https://pypi.org/project/pygitpub/"
 "Repository" = "https://github.com/veltzer/pygitpub"
 
+[project.scripts]
+pygitpub = "pygitpub.main:main"
 
 [tool.ruff]
 line-length = 130
