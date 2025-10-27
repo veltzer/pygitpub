@@ -17,29 +17,29 @@ pygitpub.configs module
 
 .. automodule:: pygitpub.configs
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pygitpub.main module
 --------------------
 
 .. automodule:: pygitpub.main
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pygitpub.static module
 ----------------------
 
 .. automodule:: pygitpub.static
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: pygitpub
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
