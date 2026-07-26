@@ -44,6 +44,10 @@ class ConfigAlgo(Config):
         help_string="Show extra git repos lying around?",
         default=True,
     )
+    base_dir = ParamCreator.create_str(
+        help_string="Base directory under which repos are cloned",
+        default="~/git",
+    )
 
 
 class ConfigOutput(Config):

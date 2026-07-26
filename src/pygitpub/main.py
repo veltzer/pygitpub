@@ -9,6 +9,8 @@ import json
 
 import pylogconf.core
 from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
+from pytconf.pydoc import get_first_line
+from pytconf.registry import the_registry
 
 import github
 import pyapikey
@@ -16,6 +18,14 @@ from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
 import pygitpub.static
 from pygitpub.utils.misc import delete, get_all_git_repos
 from pygitpub.utils.importlib import import_file
+
+
+def get_base_dir() -> str:
+    return os.path.expanduser(ConfigAlgo.base_dir)
+
+
+def get_repo_folder(repo) -> str:
+    return os.path.join(get_base_dir(), repo.name)
 
 
 def yield_repos():
@@ -53,8 +63,7 @@ def yield_repos():
 def fix_metadata() -> None:
     orig_folder = os.getcwd()
     for repo in yield_repos():
-        owner = repo.owner.login
-        folder = os.path.join(owner, repo.name)
+        folder = get_repo_folder(repo)
         if not os.path.isdir(folder):
             # print(f"folder [{folder}] does not exist, continuing...")
             continue
@@ -273,14 +282,15 @@ def runs_show_not_success() -> None:
     description="Pull all projects from github",
     configs=[
         ConfigGithub,
+        ConfigAlgo,
     ],
 )
 def pull_all() -> None:
     orig_folder = os.getcwd()
+    base_dir = get_base_dir()
     for repo in yield_repos():
-        owner = repo.owner.login
         project = repo.name
-        folder = os.path.join(owner, repo.name)
+        folder = get_repo_folder(repo)
         if os.path.isdir(folder):
             if not os.path.isfile(os.path.join(folder, ".skip")):
                 print(f"project [{project}] exists, pulling it...")
@@ -296,13 +306,15 @@ def pull_all() -> None:
             else:
                 print(f"project [{project}] exists, skipping it because of .skip file...")
         else:
-            print(f"project [{project}] does not exists, cloning it from [{repo.ssh_url}]...")
+            print(f"project [{project}] does not exists, cloning it from [{repo.ssh_url}] to [{folder}]...")
+            os.makedirs(base_dir, exist_ok=True)
             subprocess.check_call(
                 [
                     "git",
                     "clone",
                     repo.ssh_url,
-                ]
+                ],
+                cwd=base_dir,
             )
 
 
@@ -315,10 +327,10 @@ def pull_all() -> None:
 )
 def clone_all() -> None:
     all_repo_folders = set()
+    base_dir = get_base_dir()
     for repo in yield_repos():
-        owner = repo.owner.login
         project = repo.name
-        folder = os.path.join(owner, repo.name)
+        folder = get_repo_folder(repo)
         all_repo_folders.add(folder)
         # print(f"considering [{project}] from [{repo.ssh_url}]...")
         if os.path.isfile(folder):
@@ -329,21 +341,20 @@ def clone_all() -> None:
             continue
         if ConfigAlgo.dryrun:
             continue
-        print(f"cloning [{owner}:{project}] from [{repo.ssh_url}] to [{folder}]")
-        if not os.path.isdir(owner):
-            os.mkdir(owner)
+        print(f"cloning [{project}] from [{repo.ssh_url}] to [{folder}]")
+        os.makedirs(base_dir, exist_ok=True)
         subprocess.check_call(
             [
                 "git",
                 "clone",
                 repo.ssh_url,
             ],
-            cwd=owner,
+            cwd=base_dir,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
     if ConfigAlgo.show_extra:
-        disk_repos = get_all_git_repos()
+        disk_repos = get_all_git_repos(base_dir)
         extra_repos = disk_repos - all_repo_folders
         if extra_repos:
             print("extra repos follow:")
@@ -366,6 +377,34 @@ def workflows_run() -> None:
             sys.stdout.flush()
             ret = workflow.create_dispatch(ref="master")
             print(f"{ret}")
+
+
+@register_endpoint(
+    description="Show all configuration options and their current values",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+        ConfigOutput,
+    ],
+)
+def config() -> None:
+    for config_class in [ConfigGithub, ConfigAlgo, ConfigOutput]:
+        print(f"{config_class.__name__}: {get_first_line(config_class, 'undocumented')}")
+        for name, param in the_registry.yield_name_data_for_config(config_class):
+            value = getattr(config_class, name)
+            if param.required and value is param.default:
+                value_str = "MANDATORY (not set)"
+            else:
+                value_str = param.t2s(value)
+            print(f"    {name} [{param.get_type_name()}]: {value_str}")
+            print(f"        {param.help_string}")
+            if not param.required:
+                print(f"        default: {param.t2s(param.default)}")
+            more_help = param.more_help()
+            if more_help is not None:
+                print(f"        {more_help}")
+        print()
+    print(f"repos are cloned to and pulled from: {get_base_dir()}/<repo-name>")
 
 
 @register_main(
