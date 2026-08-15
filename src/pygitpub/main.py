@@ -2,22 +2,22 @@
 main entry point to the program
 """
 
+import json
 import os
 import subprocess
 import sys
-import json
-
-import pylogconf.core
-from pytconf import register_main, config_arg_parse_and_launch, register_endpoint
-from pytconf.pydoc import get_first_line
-from pytconf.registry import the_registry
 
 import github
 import pyapikey
-from pygitpub.configs import ConfigGithub, ConfigOutput, ConfigAlgo
+import pylogconf.core
+from pytconf import config_arg_parse_and_launch, register_endpoint, register_main
+from pytconf.pydoc import get_first_line
+from pytconf.registry import the_registry
+
 import pygitpub.static
-from pygitpub.utils.misc import delete, get_all_git_repos
+from pygitpub.configs import ConfigAlgo, ConfigGithub, ConfigOutput
 from pygitpub.utils.importlib import import_file
+from pygitpub.utils.misc import delete, get_all_git_repos
 
 
 def get_base_dir() -> str:
@@ -77,7 +77,7 @@ def fix_metadata() -> None:
         if not hasattr(mod, "description_short"):
             os.chdir(orig_folder)
             continue
-        description_short = getattr(mod, "description_short")
+        description_short = mod.description_short
         if description_short != repo.description:
             print(f"in {folder}...")
             print(f"description_short is [{description_short}]")
@@ -87,7 +87,7 @@ def fix_metadata() -> None:
             print(f"{folder} no keywords")
             os.chdir(orig_folder)
             continue
-        keywords = getattr(mod, "keywords")
+        keywords = mod.keywords
         if set(keywords) != set(repo.get_topics()):
             print(f"in {folder}...")
             print(f"keywords is [{keywords}]")

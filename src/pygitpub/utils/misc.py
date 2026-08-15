@@ -1,9 +1,9 @@
 """ misc.py """
 
+import glob
 import logging
 import os
 import os.path
-import glob
 
 from pygitpub import LOGGER_NAME
 
