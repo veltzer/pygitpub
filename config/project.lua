@@ -4,3 +4,4 @@ KEYWORDS = {
     "github",
     "pygithub",
 }
+PYPI = true
