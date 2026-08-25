@@ -23,8 +23,8 @@ warning_is_error = True
 project = "pygitpub"
 author = "Mark Veltzer"
 project_copyright = "2022, 2023, 2024, 2025, 2026 Mark Veltzer"
-version = "0.0.58"
-release = "0.0.58"
+version = "0.0.59"
+release = "0.0.59"
 
 html_theme_options = {
         "show_powered_by": False,
