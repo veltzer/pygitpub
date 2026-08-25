@@ -3,6 +3,14 @@ All configurations for pygitpub
 """
 from pytconf import Config, ParamCreator
 
+# The values github accepts in the "affiliation" parameter of its
+# "list repositories" api. They are sent over the wire verbatim.
+AFFILIATIONS = [
+    "owner",
+    "collaborator",
+    "organization_member",
+]
+
 
 class ConfigGithub(Config):
     """
@@ -39,6 +47,11 @@ class ConfigAlgo(Config):
     owner_login = ParamCreator.create_str_or_none(
         help_string="Only include repos owned by this owner (None for dont mind)",
         default=None,
+    )
+    affiliation = ParamCreator.create_str(
+        help_string="Comma separated list of how you are affiliated with the repos to work on"
+                    f" (any of {','.join(AFFILIATIONS)})",
+        default="owner",
     )
     show_extra = ParamCreator.create_bool(
         help_string="Show extra git repos lying around?",

@@ -15,7 +15,7 @@ from pytconf.pydoc import get_first_line
 from pytconf.registry import the_registry
 
 import pygitpub.static
-from pygitpub.configs import ConfigAlgo, ConfigGithub, ConfigOutput
+from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigGithub, ConfigOutput
 from pygitpub.utils.importlib import import_file
 from pygitpub.utils.misc import delete, get_all_git_repos
 
@@ -28,10 +28,25 @@ def get_repo_folder(repo) -> str:
     return os.path.join(get_base_dir(), repo.name)
 
 
+def get_affiliation() -> str:
+    """ validate the affiliation parameter and return it in the form github wants """
+    values = [x.strip() for x in ConfigAlgo.affiliation.split(",")]
+    values = [x for x in values if x != ""]
+    if not values:
+        raise ValueError("affiliation must not be empty")
+    for value in values:
+        if value not in AFFILIATIONS:
+            raise ValueError(f"bad affiliation [{value}], must be one of [{','.join(AFFILIATIONS)}]")
+    return ",".join(values)
+
+
 def yield_repos():
     apikey = pyapikey.get_key(ConfigGithub.apikey)
     g = github.Github(login_or_token=apikey)
-    for repo in g.get_user().get_repos():
+    # github filters by affiliation server side, so repos we are not interested
+    # in (org repos, by default) are never fetched in the first place
+    affiliation = get_affiliation()
+    for repo in g.get_user().get_repos(affiliation=affiliation):
         reason = "no reason set"
         skip = False
         if not ConfigAlgo.fork and repo.fork:
