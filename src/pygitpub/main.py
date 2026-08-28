@@ -21,7 +21,8 @@ from pygitpub.utils.misc import delete, get_all_git_repos
 
 
 def get_base_dir() -> str:
-    return os.path.expanduser(ConfigAlgo.base_dir)
+    base_dir: str = ConfigAlgo.base_dir
+    return os.path.expanduser(base_dir)
 
 
 def get_repo_folder(repo) -> str:
