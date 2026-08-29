@@ -38,6 +38,14 @@ dependencies = [
     "pyyaml",
 ]
 
+[dependency-groups]
+dev = [
+    "mypy",
+    "pylint",
+    "pytest",
+    "ruff",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/veltzer/pygitpub"
 "Bug Tracker" = "https://github.com/veltzer/pygitpub/issues"
