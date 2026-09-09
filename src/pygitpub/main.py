@@ -202,6 +202,7 @@ def repos_list() -> None:
     ],
 )
 def cleanup() -> None:
+    # pylint: disable=too-many-branches
     for repo in yield_repos():
         # 1. Cleanup workflow runs
         for workflow in repo.get_workflows():
@@ -236,27 +237,25 @@ def cleanup() -> None:
             for status in deployment.get_statuses():
                 state = status.state
                 break
-            
+
             delete_it = False
-            if state in ("failure", "error"):
-                delete_it = True
-            elif existing_deployments >= 4:
+            if state in ("failure", "error") or existing_deployments >= 4:
                 delete_it = True
             else:
                 existing_deployments += 1
-            
+
             if delete_it:
                 print(f"deleting deployment {repo.name} {deployment.id}")
                 try:
                     deployment.create_status("inactive")
-                except Exception:
-                    pass
+                except github.GithubException as e:
+                    print(f"Failed to deactivate deployment: {e}")
                 try:
                     # pylint: disable=protected-access
                     status, _, _ = deployment._requester.requestJson("DELETE", deployment.url)
                     if status != 204:
                         print(f"Failed to delete deployment: HTTP {status}")
-                except Exception as e:
+                except github.GithubException as e:
                     print(f"Failed to delete deployment: {e}")
 
         # 3. Cleanup releases
@@ -266,7 +265,7 @@ def cleanup() -> None:
                 print(f"deleting release {repo.name} {release.title}")
                 try:
                     release.delete_release()
-                except Exception as e:
+                except github.GithubException as e:
                     print(f"Failed to delete release: {e}")
             else:
                 existing_releases += 1
