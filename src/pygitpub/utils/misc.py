@@ -19,13 +19,6 @@ def get_number_of_files(folder: str) -> int:
     return count
 
 
-def delete(workflow_run):
-    # stolen from
-    # https://github.com/PyGithub/PyGithub/blob/master/github/WorkflowRun.py
-    # which is not yet in released
-    # pylint: disable=protected-access
-    status, _, _ = workflow_run._requester.requestJson("DELETE", workflow_run.url)
-    return status == 204
 
 
 def get_all_git_repos(base_dir: str) -> set[str]:

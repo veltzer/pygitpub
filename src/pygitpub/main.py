@@ -17,7 +17,7 @@ from pytconf.registry import the_registry
 import pygitpub.static
 from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigGithub, ConfigOutput
 from pygitpub.utils.lua import config_path, load_lua_file
-from pygitpub.utils.misc import delete, get_all_git_repos
+from pygitpub.utils.misc import get_all_git_repos
 
 
 def get_base_dir() -> str:
@@ -195,7 +195,7 @@ def repos_list() -> None:
     ],
 )
 def cleanup() -> None:
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,too-many-statements
     for repo in yield_repos():
         # 1. Cleanup workflow runs
         for workflow in repo.get_workflows():
@@ -219,7 +219,10 @@ def cleanup() -> None:
                     delete_it = True
                 if delete_it:
                     print(f"deleting {repo.name} {workflow.name} {run.head_branch} {run.conclusion} {run.url}")
-                    delete(run)
+                    try:
+                        run.delete()
+                    except github.GithubException as e:
+                        print(f"Failed to delete run: {e}")
                 else:
                     existing += 1
 
