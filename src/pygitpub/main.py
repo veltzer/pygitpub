@@ -194,15 +194,16 @@ def repos_list() -> None:
 
 
 @register_endpoint(
-    description="Cleanup old failing or un-needed runs in all workflows in all repositories",
+    description="Cleanup old failing or un-needed runs, deployments, and releases in all repositories",
     configs=[
         ConfigGithub,
         ConfigOutput,
         ConfigAlgo,
     ],
 )
-def runs_cleanup() -> None:
+def cleanup() -> None:
     for repo in yield_repos():
+        # 1. Cleanup workflow runs
         for workflow in repo.get_workflows():
             existing = 0
             for run in workflow.get_runs():
@@ -216,7 +217,9 @@ def runs_cleanup() -> None:
                 if run.head_branch != "master":
                     delete_it = True
                 # if its not a paged build and it failed then delete it
-                if workflow.name != "pages-build-deployment" and run.conclusion == "failure":
+                if workflow.name != "pages-build-deployment" and run.conclusion in (
+                    "failure", "cancelled", "timed_out", "startup_failure", "action_required"
+                ):
                     delete_it = True
                 if existing >= 4:
                     delete_it = True
@@ -225,6 +228,48 @@ def runs_cleanup() -> None:
                     delete(run)
                 else:
                     existing += 1
+
+        # 2. Cleanup deployments
+        existing_deployments = 0
+        for deployment in repo.get_deployments():
+            state = None
+            for status in deployment.get_statuses():
+                state = status.state
+                break
+            
+            delete_it = False
+            if state in ("failure", "error"):
+                delete_it = True
+            elif existing_deployments >= 4:
+                delete_it = True
+            else:
+                existing_deployments += 1
+            
+            if delete_it:
+                print(f"deleting deployment {repo.name} {deployment.id}")
+                try:
+                    deployment.create_status("inactive")
+                except Exception:
+                    pass
+                try:
+                    # pylint: disable=protected-access
+                    status, _, _ = deployment._requester.requestJson("DELETE", deployment.url)
+                    if status != 204:
+                        print(f"Failed to delete deployment: HTTP {status}")
+                except Exception as e:
+                    print(f"Failed to delete deployment: {e}")
+
+        # 3. Cleanup releases
+        existing_releases = 0
+        for release in repo.get_releases():
+            if existing_releases >= 4:
+                print(f"deleting release {repo.name} {release.title}")
+                try:
+                    release.delete_release()
+                except Exception as e:
+                    print(f"Failed to delete release: {e}")
+            else:
+                existing_releases += 1
 
 
 @register_endpoint(
