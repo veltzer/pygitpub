@@ -35,7 +35,7 @@ src_dirs = ["tests"]
 # ─── shell ───────────────────────────────────────────────────────────────────
 
 [processor.shellcheck]
-src_dirs = ["scripts", "src", "docs", "config"]
+src_dirs = ["scripts", "src", "config"]
 
 # ─── lua ─────────────────────────────────────────────────────────────────────
 
