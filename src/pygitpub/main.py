@@ -77,21 +77,15 @@ def yield_repos():
     ],
 )
 def fix_metadata() -> None:
-    orig_folder = os.getcwd()
     for repo in yield_repos():
         folder = get_repo_folder(repo)
         if not os.path.isdir(folder):
-            # print(f"folder [{folder}] does not exist, continuing...")
             continue
-        os.chdir(folder)
-        # print(f"doing [{folder}]...")
-        file_path = config_path("project")
+        file_path = os.path.join(folder, config_path("project"))
         if not os.path.isfile(file_path):
-            os.chdir(orig_folder)
             continue
         project = load_lua_file(file_path)
         if "DESCRIPTION_SHORT" not in project:
-            os.chdir(orig_folder)
             continue
         description_short = project["DESCRIPTION_SHORT"]
         if description_short != repo.description:
@@ -101,7 +95,6 @@ def fix_metadata() -> None:
             repo.edit(description=description_short)
         if "KEYWORDS" not in project:
             print(f"{folder} no keywords")
-            os.chdir(orig_folder)
             continue
         keywords = project["KEYWORDS"]
         if set(keywords) != set(repo.get_topics()):
@@ -109,7 +102,6 @@ def fix_metadata() -> None:
             print(f"keywords is [{keywords}]")
             print(f"repo.get_topics() is [{repo.get_topics()}]")
             repo.replace_topics(keywords)
-        os.chdir(orig_folder)
 
 
 @register_endpoint(
@@ -148,8 +140,8 @@ def homepage_fix() -> None:
 )
 def repos_json() -> None:
     for repo in yield_repos():
-        # pylint: disable=protected-access
-        json.dump(repo._rawData, fp=sys.stdout, indent=4)
+        json.dump(repo.raw_data, fp=sys.stdout, indent=4)
+        print()
 
 
 @register_endpoint(
@@ -189,6 +181,7 @@ def repos_list() -> None:
     for repo in yield_repos():
         if ConfigOutput.verbose:
             json.dump(obj=repo.raw_data, fp=sys.stdout, indent=4, sort_keys=True)
+            print()
         else:
             print(f"{repo.name}")
 
@@ -310,12 +303,8 @@ def runs_show_running() -> None:
 def runs_show_failing() -> None:
     for repo in yield_repos():
         for workflow in repo.get_workflows():
-            for run in workflow.get_runs():
-                last_run = run
-                break
-            else:
-                continue
-            if last_run.conclusion == "failure":
+            last_run = next(iter(workflow.get_runs()), None)
+            if last_run is not None and last_run.conclusion == "failure":
                 print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
 
 
@@ -329,12 +318,8 @@ def runs_show_failing() -> None:
 def runs_show_not_success() -> None:
     for repo in yield_repos():
         for workflow in repo.get_workflows():
-            for run in workflow.get_runs():
-                last_run = run
-                break
-            else:
-                continue
-            if last_run.conclusion != "success":
+            last_run = next(iter(workflow.get_runs()), None)
+            if last_run is not None and last_run.conclusion != "success":
                 print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
 
 
@@ -346,7 +331,6 @@ def runs_show_not_success() -> None:
     ],
 )
 def pull_all() -> None:
-    orig_folder = os.getcwd()
     base_dir = get_base_dir()
     for repo in yield_repos():
         project = repo.name
@@ -354,15 +338,14 @@ def pull_all() -> None:
         if os.path.isdir(folder):
             if not os.path.isfile(os.path.join(folder, ".skip")):
                 print(f"project [{project}] exists, pulling it...")
-                os.chdir(folder)
                 subprocess.check_call(
                     [
                         "git",
                         "pull",
                         # "--tags",
-                    ]
+                    ],
+                    cwd=folder,
                 )
-                os.chdir(orig_folder)
             else:
                 print(f"project [{project}] exists, skipping it because of .skip file...")
         else:
