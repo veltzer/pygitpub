@@ -16,7 +16,7 @@ from pytconf.registry import the_registry
 
 import pygitpub.static
 from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigGithub, ConfigOutput
-from pygitpub.utils.importlib import import_file
+from pygitpub.utils.lua import config_path, load_lua_file
 from pygitpub.utils.misc import delete, get_all_git_repos
 
 
@@ -85,25 +85,25 @@ def fix_metadata() -> None:
             continue
         os.chdir(folder)
         # print(f"doing [{folder}]...")
-        file_path = "config/project.py"
+        file_path = config_path("project")
         if not os.path.isfile(file_path):
             os.chdir(orig_folder)
             continue
-        mod = import_file(file_path)
-        if not hasattr(mod, "description_short"):
+        project = load_lua_file(file_path)
+        if "DESCRIPTION_SHORT" not in project:
             os.chdir(orig_folder)
             continue
-        description_short = mod.description_short
+        description_short = project["DESCRIPTION_SHORT"]
         if description_short != repo.description:
             print(f"in {folder}...")
             print(f"description_short is [{description_short}]")
             print(f"repo.description is [{repo.description}]")
             repo.edit(description=description_short)
-        if not hasattr(mod, "keywords"):
+        if "KEYWORDS" not in project:
             print(f"{folder} no keywords")
             os.chdir(orig_folder)
             continue
-        keywords = mod.keywords
+        keywords = project["KEYWORDS"]
         if set(keywords) != set(repo.get_topics()):
             print(f"in {folder}...")
             print(f"keywords is [{keywords}]")

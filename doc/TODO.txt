@@ -4,7 +4,7 @@
 	on github which has github pages setup has a "docs" folder.
 - improve the method 'yield_repos' to only make one function call and not two.
 - add a "check description" and "fix description" to check the description on github is just
-	like the description in the config/project.py
+	like the description in the config/project.lua
 - allow to cleanup runs which were triggered by the user and not by a commit.
 	(runs which you dont see a branch next to when you look at the "actions"
 	page at github)

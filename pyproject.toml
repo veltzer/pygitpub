@@ -36,6 +36,7 @@ dependencies = [
     "PyGithub",
     "pyapikey",
     "pyyaml",
+    "lupa",
 ]
 
 [dependency-groups]
@@ -94,6 +95,7 @@ namespace_packages = true
 [[tool.mypy.overrides]]
 module = [
     "github.*",
+    "lupa.*",
     "pyapikey.*",
     "pylogconf.*",
     "pytconf.*",
