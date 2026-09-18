@@ -202,7 +202,7 @@ def cleanup() -> None:
             existing = 0
             for run in workflow.get_runs():
                 if ConfigOutput.verbose:
-                    print(f"inspecting {repo.name} {workflow.name} {run.conclusion}")
+                    print(f"inspecting [workflow run] {repo.name} {workflow.name} {run.conclusion}")
                 delete_it = False
                 # if its a pages build delete it unless its in mid work (run.conclusion is None)
                 if workflow.name == "pages-build-deployment" and run.conclusion is not None:
@@ -218,7 +218,7 @@ def cleanup() -> None:
                 if existing >= 4:
                     delete_it = True
                 if delete_it:
-                    print(f"deleting {repo.name} {workflow.name} {run.head_branch} {run.conclusion} {run.url}")
+                    print(f"deleting [workflow run] {repo.name} {workflow.name} {run.head_branch} {run.conclusion} {run.url}")
                     try:
                         run.delete()
                     except github.GithubException as e:
@@ -241,7 +241,7 @@ def cleanup() -> None:
                 existing_deployments += 1
 
             if delete_it:
-                print(f"deleting deployment {repo.name} {deployment.id}")
+                print(f"deleting [deployment] {repo.name} {deployment.id}")
                 try:
                     deployment.create_status("inactive")
                 except github.GithubException as e:
@@ -258,7 +258,7 @@ def cleanup() -> None:
         existing_releases = 0
         for release in repo.get_releases():
             if existing_releases >= 4:
-                print(f"deleting release {repo.name} {release.title}")
+                print(f"deleting [release] {repo.name} {release.title}")
                 try:
                     release.delete_release()
                 except github.GithubException as e:
