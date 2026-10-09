@@ -31,7 +31,7 @@ def get_repo_folder(repo) -> str:
 
 def get_affiliation() -> str:
     """ validate the affiliation parameter and return it in the form github wants """
-    values = [x.strip() for x in ConfigAlgo.affiliation.split(",")]
+    values: list[str] = [x.strip() for x in ConfigAlgo.affiliation.split(",")]
     values = [x for x in values if x != ""]
     if not values:
         raise ValueError("affiliation must not be empty")
