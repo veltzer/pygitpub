@@ -543,36 +543,41 @@ def workflows_rerun_failing() -> None:
 
 
 @register_endpoint(
-    description="Check that repos with a docs folder have github pages and that pages are served from docs",
+    description="Check that repos with a docs/index.html have github pages and that branch pages are served from docs",
     configs=[
         ConfigGithub,
         ConfigAlgo,
     ],
 )
 def pages_check() -> None:
-    def check(repo: Repository) -> list[str]:
+    def exists(repo: Repository, path: str) -> bool:
         try:
-            repo.get_contents("docs")
-            has_docs = True
+            repo.get_contents(path)
         except github.GithubException as e:
-            # 404 covers both a missing folder and an empty repo
+            # 404 covers a missing path and an empty repo
             if e.status != 404:
                 raise
-            has_docs = False
+            return False
+        return True
+
+    def check(repo: Repository) -> list[str]:
         if not repo.has_pages:
-            return [f"{repo.name}: has a docs folder but no github pages"] if has_docs else []
+            # many repos keep notes (TODO.txt, *.md) in docs; only a docs
+            # folder with an index.html is a web site that wants pages
+            return [f"{repo.name}: has a docs/index.html but no github pages"] if exists(repo, "docs/index.html") else []
         _headers, pages = repo.requester.requestJsonAndCheck("GET", f"{repo.url}/pages")
         # pages built by a workflow deploy whatever the build produces, so the
         # docs folder only matters for pages served straight from a branch
         if pages["build_type"] != "legacy":
             return []
         source = pages["source"]
-        lines = []
         if source["path"] != "/docs":
-            lines.append(f"{repo.name}: github pages served from [{source['branch']}:{source['path']}] and not from docs")
-        elif not has_docs:
-            lines.append(f"{repo.name}: github pages served from docs but there is no docs folder")
-        return lines
+            return [f"{repo.name}: github pages served from [{source['branch']}:{source['path']}] and not from docs"]
+        # an asset site (web-assets) serves docs without an index.html, so
+        # only the folder itself has to be there
+        if not exists(repo, "docs"):
+            return [f"{repo.name}: github pages served from docs but there is no docs folder"]
+        return []
     for_each_repo(check)
 
 
@@ -654,7 +659,7 @@ def clone_all() -> None:
 
 
 @register_endpoint(
-    description="Run all workflows",
+    description="Run all workflows again by rerunning their last run on the default branch",
     configs=[
         ConfigGithub,
         ConfigOutput,
@@ -662,12 +667,27 @@ def clone_all() -> None:
     ],
 )
 def workflows_run() -> None:
-    for repo in yield_repos():
+    # rerun rather than dispatch: a dispatch needs a workflow_dispatch
+    # trigger, which build.yml (on: push) does not have
+    def run(repo: Repository) -> list[str]:
+        lines = []
         for workflow in repo.get_workflows():
-            print(f"{repo.name}: {workflow.name}...", end="")
-            sys.stdout.flush()
-            ret = workflow.create_dispatch(ref=repo.default_branch)
-            print(f"{ret}")
+            last_run = next(iter(workflow.get_runs(branch=repo.default_branch)), None)
+            if last_run is None:
+                continue
+            # github refuses to rerun a run that has not finished
+            if last_run.status != "completed":
+                lines.append(f"{repo.name}: {workflow.name} is {last_run.status}, not rerunning")
+                continue
+            lines.append(f"{repo.name}: rerunning {workflow.name}")
+            if ConfigAlgo.dryrun:
+                continue
+            try:
+                last_run.rerun()
+            except github.GithubException as e:
+                lines.append(f"Failed to rerun: {e}")
+        return lines
+    for_each_repo(run)
 
 
 @register_endpoint(
