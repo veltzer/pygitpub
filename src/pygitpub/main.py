@@ -6,6 +6,9 @@ import json
 import os
 import subprocess
 import sys
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 import github
 import pyapikey
@@ -15,7 +18,7 @@ from pytconf.pydoc import get_first_line
 from pytconf.registry import the_registry
 
 import pygitpub.static
-from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigGithub, ConfigOutput
+from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigGithub, ConfigOutput, ConfigRuns
 from pygitpub.utils.lua import config_path, load_lua_file
 from pygitpub.utils.misc import get_all_git_repos
 
@@ -296,14 +299,123 @@ def runs_show_running() -> None:
                     print(f"{repo.name}: {workflow.name} {run.conclusion}")
 
 
+# repos per GraphQL query; measured fastest at around 10
+GRAPHQL_BATCH_SIZE = 10
+# GraphQL queries in flight at once, well below github's concurrency limits
+GRAPHQL_WORKERS = 26
+
+GRAPHQL_ROLLUP_FIELD = """
+r{index}: repository(owner: {owner}, name: {name}) {{
+  defaultBranchRef {{ target {{ ... on Commit {{ statusCheckRollup {{ state }} }} }} }}
+}}
+"""
+
+GRAPHQL_SUITES_QUERY = """
+query($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          checkSuites(first: 50) {
+            nodes {
+              status
+              conclusion
+              workflowRun { workflow { name } }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+
+def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable[[str], bool]) -> None:
+    """
+    Print the workflows that are not green on the default branch head commit
+    of every repo.
+
+    Resolving statusCheckRollup is slow on github's side (~4.5s per 50 repos)
+    and cursor pagination would run the pages one after another, so the repos
+    are split into small batches, each batch is one query with an aliased
+    `repository` field per repo, and the batches run in parallel. Repos whose
+    rollup state is bad then get one more query each to name the workflows.
+    Only the head commit of the default branch is looked at, so a failed run
+    on another branch, or a scheduled run on an older commit, does not show.
+    """
+    apikey = pyapikey.get_key(ConfigGithub.apikey)
+    # the default client sleeps a second between POSTs, and every GraphQL
+    # query is a POST, which would serialize the parallel queries
+    g = github.Github(
+        login_or_token=apikey,
+        pool_size=GRAPHQL_WORKERS,
+        seconds_between_requests=None,
+        seconds_between_writes=None,
+    )
+
+    def graphql(query: str, variables: dict[str, str]) -> dict[str, Any]:
+        _headers, data = g.requester.graphql_query(query, variables)
+        result: dict[str, Any] = data["data"]
+        return result
+
+    def get_states(batch: list[str]) -> list[str | None]:
+        fields = []
+        for index, full_name in enumerate(batch):
+            owner, name = full_name.split("/", 1)
+            # json.dumps gives a correctly quoted GraphQL string literal
+            fields.append(GRAPHQL_ROLLUP_FIELD.format(index=index, owner=json.dumps(owner), name=json.dumps(name)))
+        data = graphql("query {" + "".join(fields) + "}", {})
+        states: list[str | None] = []
+        for index in range(len(batch)):
+            ref = data[f"r{index}"]["defaultBranchRef"]
+            rollup = ref and ref["target"].get("statusCheckRollup")
+            states.append(rollup and rollup["state"])
+        return states
+
+    def get_bad_workflows(full_name: str) -> list[tuple[str, str]]:
+        owner, name = full_name.split("/", 1)
+        data = graphql(GRAPHQL_SUITES_QUERY, {"owner": owner, "name": name})
+        workflows = []
+        for suite in data["repository"]["defaultBranchRef"]["target"]["checkSuites"]["nodes"]:
+            # github creates an empty, never-run suite for every installed
+            # app; without a workflow run behind it, it tells us nothing
+            if suite["workflowRun"] is None:
+                continue
+            # an unfinished suite has no conclusion yet; report its status
+            conclusion = suite["conclusion"] or suite["status"]
+            if bad_conclusion(conclusion):
+                workflows.append((suite["workflowRun"]["workflow"]["name"], conclusion.lower()))
+        return workflows
+
+    full_names = [repo.full_name for repo in yield_repos()]
+    batches = [full_names[i:i + GRAPHQL_BATCH_SIZE] for i in range(0, len(full_names), GRAPHQL_BATCH_SIZE)]
+    with ThreadPoolExecutor(GRAPHQL_WORKERS) as executor:
+        states = [state for result in executor.map(get_states, batches) for state in result]
+        # repos without any checks have no state and are skipped, as the rest
+        # api path skips workflows that never ran
+        bad = [full_name for full_name, state in zip(full_names, states) if state is not None and bad_state(state)]
+        for full_name, workflows in zip(bad, executor.map(get_bad_workflows, bad)):
+            name = full_name.split("/", 1)[1]
+            for workflow, conclusion in workflows:
+                print(f"{name}: {workflow} {conclusion}")
+
+
 @register_endpoint(
     description="Show all runs which are last and failing in all workflows and all repositories",
     configs=[
         ConfigGithub,
         ConfigAlgo,
+        ConfigRuns,
     ],
 )
 def runs_show_failing() -> None:
+    if ConfigRuns.api == "graphql":
+        graphql_show_runs(
+            lambda state: state in ("FAILURE", "ERROR"),
+            lambda conclusion: conclusion == "FAILURE",
+        )
+        return
     for repo in yield_repos():
         for workflow in repo.get_workflows():
             last_run = next(iter(workflow.get_runs()), None)
@@ -316,9 +428,16 @@ def runs_show_failing() -> None:
     configs=[
         ConfigGithub,
         ConfigAlgo,
+        ConfigRuns,
     ],
 )
 def runs_show_not_success() -> None:
+    if ConfigRuns.api == "graphql":
+        graphql_show_runs(
+            lambda state: state != "SUCCESS",
+            lambda conclusion: conclusion != "SUCCESS",
+        )
+        return
     for repo in yield_repos():
         for workflow in repo.get_workflows():
             last_run = next(iter(workflow.get_runs()), None)

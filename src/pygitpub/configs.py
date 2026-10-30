@@ -63,6 +63,26 @@ class ConfigAlgo(Config):
     )
 
 
+# The ways the runs_show_failing and runs_show_not_success endpoints can
+# query github. The first is the default.
+RUNS_APIS = [
+    "graphql",
+    "rest",
+]
+
+
+class ConfigRuns(Config):
+    """
+    Parameters to control how workflow runs are queried
+    """
+    api = ParamCreator.create_choice(
+        choice_list=RUNS_APIS,
+        help_string="graphql: check the default branch head commit of all repos in parallel batches (fast);"
+                    " rest: walk every workflow's last run on any branch (slow, one call per workflow)",
+        default="graphql",
+    )
+
+
 class ConfigOutput(Config):
     """
     Parameters to control output
