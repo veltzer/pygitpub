@@ -13,12 +13,13 @@ from typing import Any
 import github
 import pyapikey
 import pylogconf.core
+from github.Repository import Repository
 from pytconf import config_arg_parse_and_launch, register_endpoint, register_main
 from pytconf.pydoc import get_first_line
 from pytconf.registry import the_registry
 
 import pygitpub.static
-from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigGithub, ConfigOutput, ConfigRuns
+from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigCleanup, ConfigGithub, ConfigOutput, ConfigRuns
 from pygitpub.utils.lua import config_path, load_lua_file
 from pygitpub.utils.misc import get_all_git_repos
 
@@ -49,8 +50,37 @@ def get_github(**kwargs: Any) -> github.Github:
     return github.Github(auth=github.Auth.Token(apikey), **kwargs)
 
 
-def yield_repos():
-    g = get_github()
+# REST calls in flight at once when walking the repos in parallel
+REST_WORKERS = 16
+
+
+def get_parallel_github() -> github.Github:
+    """
+    A client for walking the repos from several threads. The default client
+    sleeps 0.25s before every request, which serializes the threads and alone
+    made cleanup take 15 minutes; that pause is dropped. The 1s pause between
+    writes stays, so parallel deletes do not trip github's secondary limits.
+    """
+    return get_github(per_page=100, pool_size=REST_WORKERS, seconds_between_requests=None)
+
+
+def for_each_repo(func: Callable[[Repository], list[str]]) -> None:
+    """ run func on every repo in parallel and print the lines it returns, in repo order """
+    with ThreadPoolExecutor(REST_WORKERS) as executor:
+        for lines in executor.map(func, yield_repos(get_parallel_github())):
+            for line in lines:
+                print(line)
+
+
+def get_workflow_names(repo: Repository) -> dict[int, str]:
+    """ a run's own name is not always its workflow's (pages runs are
+    'pages build and deployment' of workflow 'pages-build-deployment') """
+    return {workflow.id: workflow.name for workflow in repo.get_workflows()}
+
+
+def yield_repos(g: github.Github | None = None):
+    if g is None:
+        g = get_github()
     # github filters by affiliation server side, so repos we are not interested
     # in (org repos, by default) are never fetched in the first place
     affiliation = get_affiliation()
@@ -105,10 +135,11 @@ def fix_metadata() -> None:
             print(f"{folder} no keywords")
             continue
         keywords = project["KEYWORDS"]
-        if set(keywords) != set(repo.get_topics()):
+        # the repo listing already carries the topics, no need for get_topics()
+        if set(keywords) != set(repo.topics):
             print(f"in {folder}...")
             print(f"keywords is [{keywords}]")
-            print(f"repo.get_topics() is [{repo.get_topics()}]")
+            print(f"repo.topics is [{repo.topics}]")
             if not ConfigAlgo.dryrun:
                 repo.replace_topics(keywords)
 
@@ -204,87 +235,100 @@ def repos_list() -> None:
         ConfigGithub,
         ConfigOutput,
         ConfigAlgo,
+        ConfigCleanup,
     ],
 )
 def cleanup() -> None:
-    for repo in yield_repos():
-        # 1. Cleanup workflow runs
-        for workflow in repo.get_workflows():
-            existing = 0
-            for run in workflow.get_runs():
-                if ConfigOutput.verbose:
-                    print(f"inspecting [workflow run] {repo.name} {workflow.name} {run.status} {run.conclusion}")
-                # github refuses to delete a run that is queued or still
-                # running, so leave those alone and don't count them
-                if run.status != "completed":
-                    continue
-                delete_it = False
-                # if its a pages build delete it
-                if workflow.name == "pages-build-deployment":
-                    delete_it = True
-                # if its not on the default branch, delete it
-                if run.head_branch != repo.default_branch:
-                    delete_it = True
-                # if its not a paged build and it failed then delete it
-                if workflow.name != "pages-build-deployment" and run.conclusion in (
-                    "failure", "cancelled", "timed_out", "startup_failure", "action_required"
-                ):
-                    delete_it = True
-                if existing >= 4:
-                    delete_it = True
-                if delete_it:
-                    print(f"deleting [workflow run] {repo.name} {workflow.name} {run.head_branch} {run.conclusion} {run.url}")
-                    if ConfigAlgo.dryrun:
-                        continue
-                    try:
-                        run.delete()
-                    except github.GithubException as e:
-                        print(f"Failed to delete run: {e}")
-                else:
-                    existing += 1
+    for_each_repo(cleanup_repo)
 
-        # 2. Cleanup deployments
-        existing_deployments = 0
-        for deployment in repo.get_deployments():
-            state = None
-            for status in deployment.get_statuses():
-                state = status.state
-                break
 
-            delete_it = False
-            if state in ("failure", "error") or existing_deployments >= 4:
-                delete_it = True
-            else:
-                existing_deployments += 1
+def cleanup_repo(repo: Repository) -> list[str]:
+    lines: list[str] = []
+    # 1. Cleanup workflow runs, listed for the whole repo in one go rather
+    # than workflow by workflow; `existing` still counts per workflow
+    workflow_names = get_workflow_names(repo)
+    existing: dict[int, int] = {}
+    for run in repo.get_workflow_runs():
+        workflow_name = workflow_names.get(run.workflow_id, run.name)
+        if ConfigOutput.verbose:
+            lines.append(f"inspecting [workflow run] {repo.name} {workflow_name} {run.status} {run.conclusion}")
+        # github refuses to delete a run that is queued or still
+        # running, so leave those alone and don't count them
+        if run.status != "completed":
+            continue
+        delete_it = False
+        # if its a pages build delete it
+        if workflow_name == "pages-build-deployment":
+            delete_it = True
+        # if its not on the default branch, delete it
+        if run.head_branch != repo.default_branch:
+            delete_it = True
+        # if its not a paged build and it failed then delete it
+        if workflow_name != "pages-build-deployment" and run.conclusion in (
+            "failure", "cancelled", "timed_out", "startup_failure", "action_required"
+        ):
+            delete_it = True
+        # if it was not triggered by a commit (manual dispatch, schedule, ...)
+        if ConfigCleanup.delete_non_push_runs and run.event != "push":
+            delete_it = True
+        if existing.get(run.workflow_id, 0) >= 4:
+            delete_it = True
+        if delete_it:
+            lines.append(
+                f"deleting [workflow run] {repo.name} {workflow_name} {run.head_branch} {run.event} {run.conclusion} {run.url}"
+            )
+            if ConfigAlgo.dryrun:
+                continue
+            try:
+                run.delete()
+            except github.GithubException as e:
+                lines.append(f"Failed to delete run: {e}")
+        else:
+            existing[run.workflow_id] = existing.get(run.workflow_id, 0) + 1
 
-            if delete_it:
-                print(f"deleting [deployment] {repo.name} {deployment.id}")
-                if ConfigAlgo.dryrun:
-                    continue
-                try:
-                    deployment.create_status("inactive")
-                except github.GithubException as e:
-                    print(f"Failed to deactivate deployment: {e}")
-                try:
-                    status, _, _ = deployment._requester.requestJson("DELETE", deployment.url)
-                    if status != 204:
-                        print(f"Failed to delete deployment: HTTP {status}")
-                except github.GithubException as e:
-                    print(f"Failed to delete deployment: {e}")
+    # 2. Cleanup deployments
+    existing_deployments = 0
+    for deployment in repo.get_deployments():
+        state = None
+        for status in deployment.get_statuses():
+            state = status.state
+            break
 
-        # 3. Cleanup releases
-        existing_releases = 0
-        for release in repo.get_releases():
-            if existing_releases >= 4:
-                print(f"deleting [release] {repo.name} {release.title}")
-                if ConfigAlgo.dryrun:
-                    continue
-                try:
-                    release.delete_release()
-                except github.GithubException as e:
-                    print(f"Failed to delete release: {e}")
-            else:
-                existing_releases += 1
+        delete_it = False
+        if state in ("failure", "error") or existing_deployments >= 4:
+            delete_it = True
+        else:
+            existing_deployments += 1
+
+        if delete_it:
+            lines.append(f"deleting [deployment] {repo.name} {deployment.id}")
+            if ConfigAlgo.dryrun:
+                continue
+            try:
+                deployment.create_status("inactive")
+            except github.GithubException as e:
+                lines.append(f"Failed to deactivate deployment: {e}")
+            try:
+                status, _, _ = deployment.requester.requestJson("DELETE", deployment.url)
+                if status != 204:
+                    lines.append(f"Failed to delete deployment: HTTP {status}")
+            except github.GithubException as e:
+                lines.append(f"Failed to delete deployment: {e}")
+
+    # 3. Cleanup releases
+    existing_releases = 0
+    for release in repo.get_releases():
+        if existing_releases >= 4:
+            lines.append(f"deleting [release] {repo.name} {release.title}")
+            if ConfigAlgo.dryrun:
+                continue
+            try:
+                release.delete_release()
+            except github.GithubException as e:
+                lines.append(f"Failed to delete release: {e}")
+        else:
+            existing_releases += 1
+    return lines
 
 
 @register_endpoint(
@@ -295,10 +339,13 @@ def cleanup() -> None:
     ],
 )
 def runs_show() -> None:
-    for repo in yield_repos():
-        for workflow in repo.get_workflows():
-            for run in workflow.get_runs():
-                print(f"{repo.name}: {workflow.name} {run.conclusion}")
+    def show(repo: Repository) -> list[str]:
+        runs = list(repo.get_workflow_runs())
+        if not runs:
+            return []
+        workflow_names = get_workflow_names(repo)
+        return [f"{repo.name}: {workflow_names.get(run.workflow_id, run.name)} {run.conclusion}" for run in runs]
+    for_each_repo(show)
 
 
 @register_endpoint(
@@ -309,11 +356,14 @@ def runs_show() -> None:
     ],
 )
 def runs_show_running() -> None:
-    for repo in yield_repos():
-        for workflow in repo.get_workflows():
-            for run in workflow.get_runs():
-                if run.status in ("in_progress", "queued"):
-                    print(f"{repo.name}: {workflow.name} {run.status}")
+    def show(repo: Repository) -> list[str]:
+        # github filters by status server side, so this is two small calls
+        runs = [run for status in ("in_progress", "queued") for run in repo.get_workflow_runs(status=status)]
+        if not runs:
+            return []
+        workflow_names = get_workflow_names(repo)
+        return [f"{repo.name}: {workflow_names.get(run.workflow_id, run.name)} {run.status}" for run in runs]
+    for_each_repo(show)
 
 
 # repos per GraphQL query; measured fastest at around 10
@@ -337,7 +387,7 @@ query($owner: String!, $name: String!) {
             nodes {
               status
               conclusion
-              workflowRun { workflow { name } }
+              workflowRun { databaseId workflow { name } }
             }
           }
         }
@@ -348,10 +398,13 @@ query($owner: String!, $name: String!) {
 """
 
 
-def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable[[str], bool]) -> None:
+def graphql_bad_runs(
+    bad_state: Callable[[str], bool],
+    bad_conclusion: Callable[[str], bool],
+) -> list[tuple[str, str, str, int]]:
     """
-    Print the workflows that are not green on the default branch head commit
-    of every repo.
+    Return (repo full name, workflow name, conclusion, run id) for every
+    workflow that is not green on the default branch head commit of a repo.
 
     Resolving statusCheckRollup is slow on github's side (~4.5s per 50 repos)
     and cursor pagination would run the pages one after another, so the repos
@@ -388,7 +441,7 @@ def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable
             states.append(rollup and rollup["state"])
         return states
 
-    def get_bad_workflows(full_name: str) -> list[tuple[str, str]]:
+    def get_bad_workflows(full_name: str) -> list[tuple[str, str, str, int]]:
         owner, name = full_name.split("/", 1)
         data = graphql(GRAPHQL_SUITES_QUERY, {"owner": owner, "name": name})
         workflows = []
@@ -400,7 +453,8 @@ def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable
             # an unfinished suite has no conclusion yet; report its status
             conclusion = suite["conclusion"] or suite["status"]
             if bad_conclusion(conclusion):
-                workflows.append((suite["workflowRun"]["workflow"]["name"], conclusion.lower()))
+                run = suite["workflowRun"]
+                workflows.append((full_name, run["workflow"]["name"], conclusion.lower(), run["databaseId"]))
         return workflows
 
     full_names = [repo.full_name for repo in yield_repos()]
@@ -410,10 +464,20 @@ def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable
         # repos without any checks have no state and are skipped, as the rest
         # api path skips workflows that never ran
         bad = [full_name for full_name, state in zip(full_names, states) if state is not None and bad_state(state)]
-        for full_name, workflows in zip(bad, executor.map(get_bad_workflows, bad)):
-            name = full_name.split("/", 1)[1]
-            for workflow, conclusion in workflows:
-                print(f"{name}: {workflow} {conclusion}")
+        return [run for runs in executor.map(get_bad_workflows, bad) for run in runs]
+
+
+def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable[[str], bool]) -> None:
+    for full_name, workflow, conclusion, _run_id in graphql_bad_runs(bad_state, bad_conclusion):
+        print(f"{full_name.split('/', 1)[1]}: {workflow} {conclusion}")
+
+
+def is_failing_state(state: str) -> bool:
+    return state in ("FAILURE", "ERROR")
+
+
+def is_failing_conclusion(conclusion: str) -> bool:
+    return conclusion == "FAILURE"
 
 
 @register_endpoint(
@@ -426,10 +490,7 @@ def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable
 )
 def runs_show_failing() -> None:
     if ConfigRuns.api == "graphql":
-        graphql_show_runs(
-            lambda state: state in ("FAILURE", "ERROR"),
-            lambda conclusion: conclusion == "FAILURE",
-        )
+        graphql_show_runs(is_failing_state, is_failing_conclusion)
         return
     for repo in yield_repos():
         for workflow in repo.get_workflows():
@@ -458,6 +519,61 @@ def runs_show_not_success() -> None:
             last_run = next(iter(workflow.get_runs()), None)
             if last_run is not None and last_run.conclusion != "success":
                 print(f"{repo.name}: {workflow.name} {last_run.conclusion}")
+
+
+@register_endpoint(
+    description="Rerun the failed jobs of every failing workflow on the default branch of all repositories",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def workflows_rerun_failing() -> None:
+    # rerun rather than dispatch: a rerun works whatever the workflow's
+    # triggers are, while a dispatch needs a workflow_dispatch trigger
+    g = get_github()
+    for full_name, workflow, _conclusion, run_id in graphql_bad_runs(is_failing_state, is_failing_conclusion):
+        print(f"{full_name.split('/', 1)[1]}: rerunning failed jobs of {workflow}")
+        if ConfigAlgo.dryrun:
+            continue
+        try:
+            g.requester.requestJsonAndCheck("POST", f"/repos/{full_name}/actions/runs/{run_id}/rerun-failed-jobs")
+        except github.GithubException as e:
+            print(f"Failed to rerun: {e}")
+
+
+@register_endpoint(
+    description="Check that repos with a docs folder have github pages and that pages are served from docs",
+    configs=[
+        ConfigGithub,
+        ConfigAlgo,
+    ],
+)
+def pages_check() -> None:
+    def check(repo: Repository) -> list[str]:
+        try:
+            repo.get_contents("docs")
+            has_docs = True
+        except github.GithubException as e:
+            # 404 covers both a missing folder and an empty repo
+            if e.status != 404:
+                raise
+            has_docs = False
+        if not repo.has_pages:
+            return [f"{repo.name}: has a docs folder but no github pages"] if has_docs else []
+        _headers, pages = repo.requester.requestJsonAndCheck("GET", f"{repo.url}/pages")
+        # pages built by a workflow deploy whatever the build produces, so the
+        # docs folder only matters for pages served straight from a branch
+        if pages["build_type"] != "legacy":
+            return []
+        source = pages["source"]
+        lines = []
+        if source["path"] != "/docs":
+            lines.append(f"{repo.name}: github pages served from [{source['branch']}:{source['path']}] and not from docs")
+        elif not has_docs:
+            lines.append(f"{repo.name}: github pages served from docs but there is no docs folder")
+        return lines
+    for_each_repo(check)
 
 
 @register_endpoint(
@@ -560,10 +676,12 @@ def workflows_run() -> None:
         ConfigGithub,
         ConfigAlgo,
         ConfigOutput,
+        ConfigRuns,
+        ConfigCleanup,
     ],
 )
 def config() -> None:
-    for config_class in [ConfigGithub, ConfigAlgo, ConfigOutput]:
+    for config_class in [ConfigGithub, ConfigAlgo, ConfigOutput, ConfigRuns, ConfigCleanup]:
         print(f"{config_class.__name__}: {get_first_line(config_class, 'undocumented')}")
         for name, param in the_registry.yield_name_data_for_config(config_class):
             value = getattr(config_class, name)

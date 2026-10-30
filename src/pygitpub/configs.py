@@ -80,6 +80,16 @@ class ConfigRuns(Config):
     )
 
 
+class ConfigCleanup(Config):
+    """
+    Parameters to control the cleanup
+    """
+    delete_non_push_runs = ParamCreator.create_bool(
+        help_string="Also delete workflow runs not triggered by a push (manual dispatch, schedule, ...)?",
+        default=False,
+    )
+
+
 class ConfigOutput(Config):
     """
     Parameters to control output
