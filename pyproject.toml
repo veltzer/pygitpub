@@ -90,7 +90,6 @@ preset = "legacy"
 python-version = "3.14"
 search-path = [
     "src",
-    "scripts",
     ".",
 ]
 # Third-party libraries without type information.

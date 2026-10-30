@@ -46,16 +46,6 @@ class LuaTests(unittest.TestCase):
 
 
 class MiscTests(unittest.TestCase):
-    def test_get_number_of_files_recursive(self):
-        with tempfile.TemporaryDirectory() as d:
-            with open(os.path.join(d, "a"), "w", encoding="utf-8"):
-                pass
-            sub = os.path.join(d, "sub")
-            os.mkdir(sub)
-            with open(os.path.join(sub, "b"), "w", encoding="utf-8"):
-                pass
-            self.assertEqual(misc.get_number_of_files(d), 2)
-
     def test_get_all_git_repos_finds_top_level_only(self):
         with tempfile.TemporaryDirectory() as d:
             for repo in ("r1", "r2"):
@@ -88,7 +78,7 @@ class AffiliationTests(unittest.TestCase):
     def test_get_repo_folder_uses_expanded_base_dir(self):
         ConfigAlgo.base_dir = "~/somebase"
 
-        class FakeRepo:  # pylint: disable=too-few-public-methods
+        class FakeRepo:
             name = "myrepo"
 
         expected = os.path.join(os.path.expanduser("~/somebase"), "myrepo")

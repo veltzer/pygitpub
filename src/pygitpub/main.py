@@ -44,9 +44,13 @@ def get_affiliation() -> str:
     return ",".join(values)
 
 
-def yield_repos():
+def get_github(**kwargs: Any) -> github.Github:
     apikey = pyapikey.get_key(ConfigGithub.apikey)
-    g = github.Github(login_or_token=apikey)
+    return github.Github(auth=github.Auth.Token(apikey), **kwargs)
+
+
+def yield_repos():
+    g = get_github()
     # github filters by affiliation server side, so repos we are not interested
     # in (org repos, by default) are never fetched in the first place
     affiliation = get_affiliation()
@@ -95,7 +99,8 @@ def fix_metadata() -> None:
             print(f"in {folder}...")
             print(f"description_short is [{description_short}]")
             print(f"repo.description is [{repo.description}]")
-            repo.edit(description=description_short)
+            if not ConfigAlgo.dryrun:
+                repo.edit(description=description_short)
         if "KEYWORDS" not in project:
             print(f"{folder} no keywords")
             continue
@@ -104,32 +109,36 @@ def fix_metadata() -> None:
             print(f"in {folder}...")
             print(f"keywords is [{keywords}]")
             print(f"repo.get_topics() is [{repo.get_topics()}]")
-            repo.replace_topics(keywords)
+            if not ConfigAlgo.dryrun:
+                repo.replace_topics(keywords)
 
 
 @register_endpoint(
     description="Set the correct website for the project on all repos where it is not correct",
     configs=[
         ConfigGithub,
+        ConfigOutput,
         ConfigAlgo,
     ],
 )
 def homepage_fix() -> None:
     for repo in yield_repos():
+        owner = repo.owner.login
+        # the user site repo is served at the root of the site, usually under
+        # a custom domain, so the pattern below does not apply to it
+        if repo.name.lower() == f"{owner.lower()}.github.io":
+            if ConfigOutput.verbose:
+                print(f"skipping [{repo.name}] because it is the user site")
+            continue
         if repo.has_pages:
-            right_homepage = f"https://{ConfigGithub.username}.github.io/{repo.name}/"
-            if repo.homepage != right_homepage:
-                print(f"{repo.name} is wrong!")
-                print(f"homepage: {repo.homepage}")
-                print(f"right_homepage: {right_homepage}")
-                print(f"patching [{repo.name}]...")
-                repo.edit(repo.name, homepage=right_homepage)
+            right_homepage = f"https://{owner}.github.io/{repo.name}/"
         else:
-            right_homepage = f"https://github.com/{ConfigGithub.username}/{repo.name}/"
-            if repo.homepage != right_homepage:
-                print(f"{repo.name} is wrong!")
-                print(f"homepage: {repo.homepage}")
-                print(f"right_homepage: {right_homepage}")
+            right_homepage = f"https://github.com/{owner}/{repo.name}/"
+        if repo.homepage != right_homepage:
+            print(f"{repo.name} is wrong!")
+            print(f"homepage: {repo.homepage}")
+            print(f"right_homepage: {right_homepage}")
+            if not ConfigAlgo.dryrun:
                 print(f"patching [{repo.name}]...")
                 repo.edit(repo.name, homepage=right_homepage)
 
@@ -198,20 +207,23 @@ def repos_list() -> None:
     ],
 )
 def cleanup() -> None:
-    # pylint: disable=too-many-branches,too-many-statements
     for repo in yield_repos():
         # 1. Cleanup workflow runs
         for workflow in repo.get_workflows():
             existing = 0
             for run in workflow.get_runs():
                 if ConfigOutput.verbose:
-                    print(f"inspecting [workflow run] {repo.name} {workflow.name} {run.conclusion}")
+                    print(f"inspecting [workflow run] {repo.name} {workflow.name} {run.status} {run.conclusion}")
+                # github refuses to delete a run that is queued or still
+                # running, so leave those alone and don't count them
+                if run.status != "completed":
+                    continue
                 delete_it = False
-                # if its a pages build delete it unless its in mid work (run.conclusion is None)
-                if workflow.name == "pages-build-deployment" and run.conclusion is not None:
+                # if its a pages build delete it
+                if workflow.name == "pages-build-deployment":
                     delete_it = True
-                # if its not on the master branch, delete it
-                if run.head_branch != "master":
+                # if its not on the default branch, delete it
+                if run.head_branch != repo.default_branch:
                     delete_it = True
                 # if its not a paged build and it failed then delete it
                 if workflow.name != "pages-build-deployment" and run.conclusion in (
@@ -222,6 +234,8 @@ def cleanup() -> None:
                     delete_it = True
                 if delete_it:
                     print(f"deleting [workflow run] {repo.name} {workflow.name} {run.head_branch} {run.conclusion} {run.url}")
+                    if ConfigAlgo.dryrun:
+                        continue
                     try:
                         run.delete()
                     except github.GithubException as e:
@@ -245,12 +259,13 @@ def cleanup() -> None:
 
             if delete_it:
                 print(f"deleting [deployment] {repo.name} {deployment.id}")
+                if ConfigAlgo.dryrun:
+                    continue
                 try:
                     deployment.create_status("inactive")
                 except github.GithubException as e:
                     print(f"Failed to deactivate deployment: {e}")
                 try:
-                    # pylint: disable=protected-access
                     status, _, _ = deployment._requester.requestJson("DELETE", deployment.url)
                     if status != 204:
                         print(f"Failed to delete deployment: HTTP {status}")
@@ -262,6 +277,8 @@ def cleanup() -> None:
         for release in repo.get_releases():
             if existing_releases >= 4:
                 print(f"deleting [release] {repo.name} {release.title}")
+                if ConfigAlgo.dryrun:
+                    continue
                 try:
                     release.delete_release()
                 except github.GithubException as e:
@@ -295,8 +312,8 @@ def runs_show_running() -> None:
     for repo in yield_repos():
         for workflow in repo.get_workflows():
             for run in workflow.get_runs():
-                if run.conclusion is None:
-                    print(f"{repo.name}: {workflow.name} {run.conclusion}")
+                if run.status in ("in_progress", "queued"):
+                    print(f"{repo.name}: {workflow.name} {run.status}")
 
 
 # repos per GraphQL query; measured fastest at around 10
@@ -344,11 +361,9 @@ def graphql_show_runs(bad_state: Callable[[str], bool], bad_conclusion: Callable
     Only the head commit of the default branch is looked at, so a failed run
     on another branch, or a scheduled run on an older commit, does not show.
     """
-    apikey = pyapikey.get_key(ConfigGithub.apikey)
     # the default client sleeps a second between POSTs, and every GraphQL
     # query is a POST, which would serialize the parallel queries
-    g = github.Github(
-        login_or_token=apikey,
+    g = get_github(
         pool_size=GRAPHQL_WORKERS,
         seconds_between_requests=None,
         seconds_between_writes=None,
@@ -464,7 +479,6 @@ def pull_all() -> None:
                     [
                         "git",
                         "pull",
-                        # "--tags",
                     ],
                     cwd=folder,
                 )
@@ -484,7 +498,7 @@ def pull_all() -> None:
 
 
 @register_endpoint(
-    description="Pull all projects from github",
+    description="Clone all projects from github",
     configs=[
         ConfigGithub,
         ConfigAlgo,
@@ -497,12 +511,9 @@ def clone_all() -> None:
         project = repo.name
         folder = get_repo_folder(repo)
         all_repo_folders.add(folder)
-        # print(f"considering [{project}] from [{repo.ssh_url}]...")
         if os.path.isfile(folder):
-            # print(f"skipping [{folder}] as it is not to be cloned...")
             continue
         if os.path.isdir(folder):
-            # print(f"skipping [{folder}] as it is already cloned...")
             continue
         if ConfigAlgo.dryrun:
             continue
@@ -516,7 +527,6 @@ def clone_all() -> None:
             ],
             cwd=base_dir,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
         )
     if ConfigAlgo.show_extra:
         disk_repos = get_all_git_repos(base_dir)
@@ -540,7 +550,7 @@ def workflows_run() -> None:
         for workflow in repo.get_workflows():
             print(f"{repo.name}: {workflow.name}...", end="")
             sys.stdout.flush()
-            ret = workflow.create_dispatch(ref="master")
+            ret = workflow.create_dispatch(ref=repo.default_branch)
             print(f"{ret}")
 
 

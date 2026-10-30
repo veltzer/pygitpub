@@ -14,11 +14,8 @@ AFFILIATIONS = [
 
 class ConfigGithub(Config):
     """
-    Paramters for your github account
+    Parameters for your github account
     """
-    username = ParamCreator.create_str(
-        help_string="What is your github username?",
-    )
     apikey = ParamCreator.create_str(
         help_string="What is the name of your apikey (see pyapikey)?",
     )
