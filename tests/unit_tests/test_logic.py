@@ -7,6 +7,8 @@ from types import SimpleNamespace
 from typing import ClassVar
 from unittest import mock
 
+import github
+
 from pygitpub import main
 from pygitpub.configs import ConfigAlgo
 from pygitpub.utils import lua, misc
@@ -138,3 +140,118 @@ class GraphqlBadRunsTests(unittest.TestCase):
     def test_failing(self):
         runs = self.run_bad_runs(main.is_failing_state, main.is_failing_conclusion)
         self.assertEqual(runs, [("me/r3", "build", "failure", 2)])
+
+
+def not_found() -> github.GithubException:
+    return github.GithubException(404, {"message": "Not Found"})
+
+
+class FakePagesRepo:
+    """ a repo with the given files; pages is the /pages answer or None """
+
+    def __init__(self, files, pages=None):
+        self.name = "r"
+        self.url = "https://api.github.com/repos/me/r"
+        self.files = files
+        self.has_pages = pages is not None
+        self.requester = SimpleNamespace(requestJsonAndCheck=lambda verb, url: ({}, pages))
+
+    def get_contents(self, path):
+        if path not in self.files:
+            raise not_found()
+        return SimpleNamespace(path=path)
+
+
+def legacy_pages(path="/docs"):
+    return {"build_type": "legacy", "source": {"branch": "master", "path": path}}
+
+
+class PagesCheckTests(unittest.TestCase):
+    def test_site_without_pages(self):
+        repo = FakePagesRepo({"docs", "docs/index.html"})
+        self.assertEqual(main.pages_check_repo(repo), ["r: has a docs/index.html but no github pages"])
+
+    def test_notes_folder_without_pages_is_fine(self):
+        self.assertEqual(main.pages_check_repo(FakePagesRepo({"docs", "docs/TODO.txt"})), [])
+
+    def test_workflow_pages_are_not_checked(self):
+        repo = FakePagesRepo(set(), {"build_type": "workflow", "source": {"branch": "master", "path": "/"}})
+        self.assertEqual(main.pages_check_repo(repo), [])
+
+    def test_branch_pages_not_from_docs(self):
+        repo = FakePagesRepo({"docs"}, legacy_pages("/"))
+        self.assertEqual(main.pages_check_repo(repo), ["r: github pages served from [master:/] and not from docs"])
+
+    def test_branch_pages_from_missing_docs(self):
+        repo = FakePagesRepo(set(), legacy_pages())
+        self.assertEqual(main.pages_check_repo(repo), ["r: github pages served from docs but there is no docs folder"])
+
+    def test_asset_site_without_index_is_fine(self):
+        self.assertEqual(main.pages_check_repo(FakePagesRepo({"docs"}, legacy_pages())), [])
+
+    def test_other_errors_are_raised(self):
+        repo = FakePagesRepo(set())
+        repo.get_contents = mock.Mock(side_effect=github.GithubException(500, {}))
+        with self.assertRaises(github.GithubException):
+            main.pages_check_repo(repo)
+
+
+class WorkflowsRunTests(unittest.TestCase):
+    def tearDown(self):
+        ConfigAlgo.dryrun = False
+
+    def make_repo(self):
+        self.done = mock.Mock(status="completed")
+        self.running = mock.Mock(status="in_progress")
+        # SimpleNamespace, since Mock(name=...) names the mock instead of
+        # setting a name attribute
+        self.workflows = [
+            SimpleNamespace(name="build", get_runs=mock.Mock(return_value=[self.done, mock.Mock()])),
+            SimpleNamespace(name="pages", get_runs=mock.Mock(return_value=[self.running])),
+            SimpleNamespace(name="never", get_runs=mock.Mock(return_value=[])),
+        ]
+        return SimpleNamespace(name="r", default_branch="main", get_workflows=lambda: self.workflows)
+
+    def test_reruns_last_finished_run_on_default_branch(self):
+        lines = main.workflows_run_repo(self.make_repo())
+        self.assertEqual(lines, ["r: rerunning build", "r: pages is in_progress, not rerunning"])
+        self.done.rerun.assert_called_once_with()
+        self.running.rerun.assert_not_called()
+        for workflow in self.workflows:
+            workflow.get_runs.assert_called_once_with(branch="main")
+
+    def test_dryrun_does_not_rerun(self):
+        ConfigAlgo.dryrun = True
+        lines = main.workflows_run_repo(self.make_repo())
+        self.assertIn("r: rerunning build", lines)
+        self.done.rerun.assert_not_called()
+
+    def test_rerun_failure_is_reported(self):
+        repo = self.make_repo()
+        self.done.rerun.side_effect = github.GithubException(403, {"message": "nope"})
+        self.assertTrue(main.workflows_run_repo(repo)[1].startswith("Failed to rerun:"))
+
+
+class YieldReposTests(unittest.TestCase):
+    def tearDown(self):
+        ConfigAlgo.repos = []
+
+    def fake_github(self, names):
+        repos = [
+            SimpleNamespace(name=name, fork=False, private=False, owner=SimpleNamespace(login="me"))
+            for name in names
+        ]
+        user = SimpleNamespace(get_repos=lambda affiliation: repos)
+        return SimpleNamespace(get_user=lambda: user)
+
+    def test_all_repos_by_default(self):
+        found = [repo.name for repo in main.yield_repos(self.fake_github(["a", "b"]))]
+        self.assertEqual(found, ["a", "b"])
+
+    def test_repos_selects_and_reports_unknown_names(self):
+        ConfigAlgo.repos = ["b", "zz"]
+        with mock.patch("sys.stderr") as stderr:
+            found = [repo.name for repo in main.yield_repos(self.fake_github(["a", "b"]))]
+        self.assertEqual(found, ["b"])
+        written = "".join(call.args[0] for call in stderr.write.call_args_list)
+        self.assertIn("no repo named [zz] found", written)

@@ -41,6 +41,10 @@ class ConfigAlgo(Config):
         help_string="Do a try run?",
         default=False,
     )
+    repos = ParamCreator.create_list_str(
+        help_string="Only include repos with these names, comma separated (empty for all)",
+        default=[],
+    )
     owner_login = ParamCreator.create_str_or_none(
         help_string="Only include repos owned by this owner (None for dont mind)",
         default=None,

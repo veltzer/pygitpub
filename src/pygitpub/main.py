@@ -84,9 +84,17 @@ def yield_repos(g: github.Github | None = None):
     # github filters by affiliation server side, so repos we are not interested
     # in (org repos, by default) are never fetched in the first place
     affiliation = get_affiliation()
+    wanted = set(ConfigAlgo.repos)
+    seen = set()
     for repo in g.get_user().get_repos(affiliation=affiliation):
         reason = "no reason set"
         skip = False
+        if wanted:
+            if repo.name in wanted:
+                seen.add(repo.name)
+            else:
+                reason = "not in --repos"
+                skip = True
         if not ConfigAlgo.fork and repo.fork:
             reason = "repo is a fork"
             skip = True
@@ -104,6 +112,9 @@ def yield_repos(g: github.Github | None = None):
                 print(f"skipping [{repo.name}] because [{reason}]...")
             continue
         yield repo
+    # a misspelled name would otherwise just do nothing
+    for name in sorted(wanted - seen):
+        print(f"no repo named [{name}] found", file=sys.stderr)
 
 
 @register_endpoint(
@@ -550,35 +561,38 @@ def workflows_rerun_failing() -> None:
     ],
 )
 def pages_check() -> None:
-    def exists(repo: Repository, path: str) -> bool:
-        try:
-            repo.get_contents(path)
-        except github.GithubException as e:
-            # 404 covers a missing path and an empty repo
-            if e.status != 404:
-                raise
-            return False
-        return True
+    for_each_repo(pages_check_repo)
 
-    def check(repo: Repository) -> list[str]:
-        if not repo.has_pages:
-            # many repos keep notes (TODO.txt, *.md) in docs; only a docs
-            # folder with an index.html is a web site that wants pages
-            return [f"{repo.name}: has a docs/index.html but no github pages"] if exists(repo, "docs/index.html") else []
-        _headers, pages = repo.requester.requestJsonAndCheck("GET", f"{repo.url}/pages")
-        # pages built by a workflow deploy whatever the build produces, so the
-        # docs folder only matters for pages served straight from a branch
-        if pages["build_type"] != "legacy":
-            return []
-        source = pages["source"]
-        if source["path"] != "/docs":
-            return [f"{repo.name}: github pages served from [{source['branch']}:{source['path']}] and not from docs"]
-        # an asset site (web-assets) serves docs without an index.html, so
-        # only the folder itself has to be there
-        if not exists(repo, "docs"):
-            return [f"{repo.name}: github pages served from docs but there is no docs folder"]
+
+def path_exists(repo: Repository, path: str) -> bool:
+    try:
+        repo.get_contents(path)
+    except github.GithubException as e:
+        # 404 covers a missing path and an empty repo
+        if e.status != 404:
+            raise
+        return False
+    return True
+
+
+def pages_check_repo(repo: Repository) -> list[str]:
+    if not repo.has_pages:
+        # many repos keep notes (TODO.txt, *.md) in docs; only a docs
+        # folder with an index.html is a web site that wants pages
+        return [f"{repo.name}: has a docs/index.html but no github pages"] if path_exists(repo, "docs/index.html") else []
+    _headers, pages = repo.requester.requestJsonAndCheck("GET", f"{repo.url}/pages")
+    # pages built by a workflow deploy whatever the build produces, so the
+    # docs folder only matters for pages served straight from a branch
+    if pages["build_type"] != "legacy":
         return []
-    for_each_repo(check)
+    source = pages["source"]
+    if source["path"] != "/docs":
+        return [f"{repo.name}: github pages served from [{source['branch']}:{source['path']}] and not from docs"]
+    # an asset site (web-assets) serves docs without an index.html, so
+    # only the folder itself has to be there
+    if not path_exists(repo, "docs"):
+        return [f"{repo.name}: github pages served from docs but there is no docs folder"]
+    return []
 
 
 @register_endpoint(
@@ -667,27 +681,29 @@ def clone_all() -> None:
     ],
 )
 def workflows_run() -> None:
+    for_each_repo(workflows_run_repo)
+
+
+def workflows_run_repo(repo: Repository) -> list[str]:
     # rerun rather than dispatch: a dispatch needs a workflow_dispatch
     # trigger, which build.yml (on: push) does not have
-    def run(repo: Repository) -> list[str]:
-        lines = []
-        for workflow in repo.get_workflows():
-            last_run = next(iter(workflow.get_runs(branch=repo.default_branch)), None)
-            if last_run is None:
-                continue
-            # github refuses to rerun a run that has not finished
-            if last_run.status != "completed":
-                lines.append(f"{repo.name}: {workflow.name} is {last_run.status}, not rerunning")
-                continue
-            lines.append(f"{repo.name}: rerunning {workflow.name}")
-            if ConfigAlgo.dryrun:
-                continue
-            try:
-                last_run.rerun()
-            except github.GithubException as e:
-                lines.append(f"Failed to rerun: {e}")
-        return lines
-    for_each_repo(run)
+    lines = []
+    for workflow in repo.get_workflows():
+        last_run = next(iter(workflow.get_runs(branch=repo.default_branch)), None)
+        if last_run is None:
+            continue
+        # github refuses to rerun a run that has not finished
+        if last_run.status != "completed":
+            lines.append(f"{repo.name}: {workflow.name} is {last_run.status}, not rerunning")
+            continue
+        lines.append(f"{repo.name}: rerunning {workflow.name}")
+        if ConfigAlgo.dryrun:
+            continue
+        try:
+            last_run.rerun()
+        except github.GithubException as e:
+            lines.append(f"Failed to rerun: {e}")
+    return lines
 
 
 @register_endpoint(
