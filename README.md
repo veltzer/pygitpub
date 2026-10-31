@@ -9,7 +9,7 @@ project website: https://veltzer.github.io/pygitpub
 
 author: Mark Veltzer
 
-version: 0.0.66
+version: 0.0.67
 
 ## github
 
