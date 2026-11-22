@@ -5,7 +5,7 @@
 
 description: Pygitpub will help you work with github
 
-project website: https://veltzer.github.io/pygitpub
+project website: <https://veltzer.github.io/pygitpub>
 
 author: Mark Veltzer
 
