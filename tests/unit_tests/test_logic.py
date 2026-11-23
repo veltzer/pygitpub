@@ -9,6 +9,7 @@ from unittest import mock
 
 import github
 import github.Repository
+import pytest
 
 from pygitpub import main
 from pygitpub.configs import ConfigAlgo
@@ -17,11 +18,11 @@ from pygitpub.utils import lua, misc
 
 class LuaTests(unittest.TestCase):
     def test_config_path(self):
-        self.assertEqual(lua.config_path("project"), os.path.join("config", "project.lua"))
+        assert lua.config_path("project") == os.path.join("config", "project.lua")
 
     def test_lua_to_python_scalar(self):
-        self.assertEqual(lua.lua_to_python(5), 5)
-        self.assertEqual(lua.lua_to_python("hello"), "hello")
+        assert lua.lua_to_python(5) == 5
+        assert lua.lua_to_python("hello") == "hello"
 
     def test_load_lua_file_dict_and_list(self):
         source = 'NAME = "pygitpub"\nKEYWORDS = {"a", "b", "c"}\n'
@@ -30,8 +31,8 @@ class LuaTests(unittest.TestCase):
             name = fh.name
         try:
             values = lua.load_lua_file(name)
-            self.assertEqual(values["NAME"], "pygitpub")
-            self.assertEqual(values["KEYWORDS"], ["a", "b", "c"])
+            assert values["NAME"] == "pygitpub"
+            assert values["KEYWORDS"] == ["a", "b", "c"]
         finally:
             os.unlink(name)
 
@@ -42,12 +43,12 @@ class LuaTests(unittest.TestCase):
             name = fh.name
         try:
             values = lua.load_lua_file(name)
-            self.assertEqual(values["DATA"], {"x": 1, "y": 2})
+            assert values["DATA"] == {"x": 1, "y": 2}
         finally:
             os.unlink(name)
 
     def test_load_lua_file_missing_raises(self):
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             lua.load_lua_file(os.path.join(tempfile.gettempdir(), "no_such_pygitpub_file.lua"))
 
 
@@ -59,7 +60,7 @@ class MiscTests(unittest.TestCase):
             # a submodule-style nested .git must NOT be reported
             os.makedirs(os.path.join(d, "r1", "sub", ".git"))
             found = misc.get_all_git_repos(d)
-            self.assertEqual(found, {os.path.join(d, "r1"), os.path.join(d, "r2")})
+            assert found == {os.path.join(d, "r1"), os.path.join(d, "r2")}
 
 
 class AffiliationTests(unittest.TestCase):
@@ -69,16 +70,16 @@ class AffiliationTests(unittest.TestCase):
 
     def test_get_affiliation_normalizes_whitespace(self):
         ConfigAlgo.affiliation = " owner , collaborator "
-        self.assertEqual(main.get_affiliation(), "owner,collaborator")
+        assert main.get_affiliation() == "owner,collaborator"
 
     def test_get_affiliation_rejects_bad_value(self):
         ConfigAlgo.affiliation = "owner,bogus"
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError, match="bad affiliation"):
             main.get_affiliation()
 
     def test_get_affiliation_rejects_empty(self):
         ConfigAlgo.affiliation = " , "
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError, match="must not be empty"):
             main.get_affiliation()
 
     def test_get_repo_folder_uses_expanded_base_dir(self):
@@ -88,7 +89,7 @@ class AffiliationTests(unittest.TestCase):
             name = "myrepo"
 
         expected = os.path.join(os.path.expanduser("~/somebase"), "myrepo")
-        self.assertEqual(main.get_repo_folder(FakeRepo()), expected)
+        assert main.get_repo_folder(FakeRepo()) == expected
 
 
 class GraphqlBadRunsTests(unittest.TestCase):
@@ -98,7 +99,7 @@ class GraphqlBadRunsTests(unittest.TestCase):
 
     def fake_graphql_query(self, query, variables):
         if "checkSuites" in query:
-            self.assertIn(variables["name"], ("r3", "r7"))
+            assert variables["name"] in ("r3", "r7")
             nodes = [
                 # the empty suite an installed app leaves on every commit
                 {"status": "QUEUED", "conclusion": None, "workflowRun": None},
@@ -131,16 +132,11 @@ class GraphqlBadRunsTests(unittest.TestCase):
 
     def test_not_success(self):
         runs = self.run_bad_runs(lambda state: state != "SUCCESS", lambda conclusion: conclusion != "SUCCESS")
-        self.assertEqual(runs, [
-            ("me/r3", "build", "failure", 2),
-            ("me/r3", "pages", "in_progress", 3),
-            ("me/r7", "build", "failure", 2),
-            ("me/r7", "pages", "in_progress", 3),
-        ])
+        assert runs == [("me/r3", "build", "failure", 2), ("me/r3", "pages", "in_progress", 3), ("me/r7", "build", "failure", 2), ("me/r7", "pages", "in_progress", 3)]
 
     def test_failing(self):
         runs = self.run_bad_runs(main.is_failing_state, main.is_failing_conclusion)
-        self.assertEqual(runs, [("me/r3", "build", "failure", 2)])
+        assert runs == [("me/r3", "build", "failure", 2)]
 
 
 def as_repo(fake: Any) -> github.Repository.Repository:
@@ -180,30 +176,30 @@ def legacy_pages(path="/docs"):
 class PagesCheckTests(unittest.TestCase):
     def test_site_without_pages(self):
         repo = FakePagesRepo({"docs", "docs/index.html"})
-        self.assertEqual(main.pages_check_repo(as_repo(repo)), ["r: has a docs/index.html but no github pages"])
+        assert main.pages_check_repo(as_repo(repo)) == ["r: has a docs/index.html but no github pages"]
 
     def test_notes_folder_without_pages_is_fine(self):
-        self.assertEqual(main.pages_check_repo(as_repo(FakePagesRepo({"docs", "docs/TODO.txt"}))), [])
+        assert main.pages_check_repo(as_repo(FakePagesRepo({"docs", "docs/TODO.txt"}))) == []
 
     def test_workflow_pages_are_not_checked(self):
         repo = FakePagesRepo(set(), {"build_type": "workflow", "source": {"branch": "master", "path": "/"}})
-        self.assertEqual(main.pages_check_repo(as_repo(repo)), [])
+        assert main.pages_check_repo(as_repo(repo)) == []
 
     def test_branch_pages_not_from_docs(self):
         repo = FakePagesRepo({"docs"}, legacy_pages("/"))
-        self.assertEqual(main.pages_check_repo(as_repo(repo)), ["r: github pages served from [master:/] and not from docs"])
+        assert main.pages_check_repo(as_repo(repo)) == ["r: github pages served from [master:/] and not from docs"]
 
     def test_branch_pages_from_missing_docs(self):
         repo = FakePagesRepo(set(), legacy_pages())
-        self.assertEqual(main.pages_check_repo(as_repo(repo)), ["r: github pages served from docs but there is no docs folder"])
+        assert main.pages_check_repo(as_repo(repo)) == ["r: github pages served from docs but there is no docs folder"]
 
     def test_asset_site_without_index_is_fine(self):
-        self.assertEqual(main.pages_check_repo(as_repo(FakePagesRepo({"docs"}, legacy_pages()))), [])
+        assert main.pages_check_repo(as_repo(FakePagesRepo({"docs"}, legacy_pages()))) == []
 
     def test_other_errors_are_raised(self):
         repo = FakePagesRepo(set())
         repo.get_contents = mock.Mock(side_effect=github.GithubException(500, {}))
-        with self.assertRaises(github.GithubException):
+        with pytest.raises(github.GithubException):
             main.pages_check_repo(as_repo(repo))
 
 
@@ -225,7 +221,7 @@ class WorkflowsRunTests(unittest.TestCase):
 
     def test_reruns_last_finished_run_on_default_branch(self):
         lines = main.workflows_run_repo(as_repo(self.make_repo()))
-        self.assertEqual(lines, ["r: rerunning build", "r: pages is in_progress, not rerunning"])
+        assert lines == ["r: rerunning build", "r: pages is in_progress, not rerunning"]
         self.done.rerun.assert_called_once_with()
         self.running.rerun.assert_not_called()
         for workflow in self.workflows:
@@ -234,13 +230,13 @@ class WorkflowsRunTests(unittest.TestCase):
     def test_dryrun_does_not_rerun(self):
         ConfigAlgo.dryrun = True
         lines = main.workflows_run_repo(as_repo(self.make_repo()))
-        self.assertIn("r: rerunning build", lines)
+        assert "r: rerunning build" in lines
         self.done.rerun.assert_not_called()
 
     def test_rerun_failure_is_reported(self):
         repo = self.make_repo()
         self.done.rerun.side_effect = github.GithubException(403, {"message": "nope"})
-        self.assertTrue(main.workflows_run_repo(as_repo(repo))[1].startswith("Failed to rerun:"))
+        assert main.workflows_run_repo(as_repo(repo))[1].startswith("Failed to rerun:")
 
 
 class YieldReposTests(unittest.TestCase):
@@ -257,12 +253,12 @@ class YieldReposTests(unittest.TestCase):
 
     def test_all_repos_by_default(self):
         found = [repo.name for repo in main.yield_repos(as_github(self.fake_github(["a", "b"])))]
-        self.assertEqual(found, ["a", "b"])
+        assert found == ["a", "b"]
 
     def test_repos_selects_and_reports_unknown_names(self):
         ConfigAlgo.repos = ["b", "zz"]
         with mock.patch("sys.stderr") as stderr:
             found = [repo.name for repo in main.yield_repos(as_github(self.fake_github(["a", "b"])))]
-        self.assertEqual(found, ["b"])
+        assert found == ["b"]
         written = "".join(call.args[0] for call in stderr.write.call_args_list)
-        self.assertIn("no repo named [zz] found", written)
+        assert "no repo named [zz] found" in written
