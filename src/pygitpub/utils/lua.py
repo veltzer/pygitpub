@@ -46,7 +46,7 @@ def load_lua_file(path: str) -> dict[str, Any]:
     """
     if not os.path.isfile(path):
         raise FileNotFoundError(path)
-    runtime = lupa.LuaRuntime()
+    runtime = lupa.LuaRuntime(unpack_returned_tuples=False)
     with open(path, encoding="utf-8") as stream:
         runtime.execute(stream.read())
     globals_table = runtime.globals()

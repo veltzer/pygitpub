@@ -330,7 +330,7 @@ def cleanup_repo(repo: Repository) -> list[str]:
     existing_releases = 0
     for release in repo.get_releases():
         if existing_releases >= 4:
-            lines.append(f"deleting [release] {repo.name} {release.title}")
+            lines.append(f"deleting [release] {repo.name} {release.name}")
             if ConfigAlgo.dryrun:
                 continue
             try:
@@ -474,7 +474,7 @@ def graphql_bad_runs(
         states = [state for result in executor.map(get_states, batches) for state in result]
         # repos without any checks have no state and are skipped, as the rest
         # api path skips workflows that never ran
-        bad = [full_name for full_name, state in zip(full_names, states) if state is not None and bad_state(state)]
+        bad = [full_name for full_name, state in zip(full_names, states, strict=True) if state is not None and bad_state(state)]
         return [run for runs in executor.map(get_bad_workflows, bad) for run in runs]
 
 
@@ -721,10 +721,7 @@ def config() -> None:
         print(f"{config_class.__name__}: {get_first_line(config_class, 'undocumented')}")
         for name, param in the_registry.yield_name_data_for_config(config_class):
             value = getattr(config_class, name)
-            if param.required and value is param.default:
-                value_str = "MANDATORY (not set)"
-            else:
-                value_str = param.t2s(value)
+            value_str = "MANDATORY (not set)" if param.required and value is param.default else param.t2s(value)
             print(f"    {name} [{param.get_type_name()}]: {value_str}")
             print(f"        {param.help_string}")
             if not param.required:

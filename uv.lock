@@ -513,6 +513,7 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
     { name = "sphinx" },
+    { name = "types-lupa" },
 ]
 
 [package.metadata]
@@ -531,6 +532,7 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
     { name = "sphinx" },
+    { name = "types-lupa" },
 ]
 
 [[package]]
@@ -627,16 +629,16 @@ wheels = [
 
 [[package]]
 name = "pytconf"
-version = "0.1.25"
+version = "0.1.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyyaml" },
     { name = "termcolor" },
     { name = "yattag" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/52/38/5ae31d2ac136c8c651c53ac2c9088c62ee885c07fdf8fb789f98c2acc275/pytconf-0.1.25.tar.gz", hash = "sha256:5ef41fe4bc2fb4e4491f26d3eee4d85f5ac7aea59322812c14e8beb6ebee2fbc", size = 13115, upload-time = "2026-09-05T14:24:05.173Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5b/66/2184f81a8567260c687e5f775bfad28692e52aed66a1b4fb0776436ca18a/pytconf-0.1.26.tar.gz", hash = "sha256:00148f65ba185459f9da66927bb8e412131d3f3ccc560e9a2cfe44124d9e4b9b", size = 13986, upload-time = "2026-11-23T09:42:54.253Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/70/74/fe5898fc36905297260780e3565eb493e0ff6ff052bbd7e751aed750ab91/pytconf-0.1.25-py3-none-any.whl", hash = "sha256:a5ec62a491d6680ff0f5f97e9835c51f1c2169a8ed6138ce1750b555d3aa57e5", size = 15097, upload-time = "2026-09-05T14:24:03.809Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/b8/65c1ed61eff7ae4ccacac4bd01c8cea247efc15a75da0e670ac414353c1f/pytconf-0.1.26-py3-none-any.whl", hash = "sha256:2796dc2dfb314a8b01d945807a87141b2fb98fdd723b8b50b0f2f0cd8b9fb7a1", size = 15254, upload-time = "2026-11-23T09:42:52.837Z" },
 ]
 
 [[package]]
@@ -828,6 +830,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/46/79/cf31d7a93a8fdc6aa0fbb665be84426a8c5a557d9240b6239e9e11e35fc5/termcolor-3.3.0.tar.gz", hash = "sha256:348871ca648ec6a9a983a13ab626c0acce02f515b9e1983332b17af7979521c5", size = 14434, upload-time = "2025-12-29T12:55:21.882Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/33/d1/8bb87d21e9aeb323cc03034f5eaf2c8f69841e40e4853c2627edf8111ed3/termcolor-3.3.0-py3-none-any.whl", hash = "sha256:cf642efadaf0a8ebbbf4bc7a31cec2f9b5f21a9f726f4ccbb08192c9c26f43a5", size = 7734, upload-time = "2025-12-29T12:55:20.718Z" },
+]
+
+[[package]]
+name = "types-lupa"
+version = "2.8.0.20260827"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/07/73130da30db32e52548010f7ffc1dede4e8ba5e1ee99078031f39cddd05b/types_lupa-2.8.0.20260827.tar.gz", hash = "sha256:c54967eb3536320adb039661910fae7175af776f9500cc9cf99e628b7951ef4e", size = 10387, upload-time = "2026-08-27T12:06:38.975Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/36/0b/6f202696fc54dc8ec91b1ae90cd3458392d538d9fa369321b702a8c14a43/types_lupa-2.8.0.20260827-py3-none-any.whl", hash = "sha256:edabd17e595626226151459eb25bb52d282d617974a99abe30b55ae58f7dbe90", size = 17057, upload-time = "2026-08-27T12:06:38.184Z" },
 ]
 
 [[package]]
