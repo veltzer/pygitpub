@@ -6,14 +6,12 @@ import json
 import os
 import subprocess
 import sys
-from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import github
 import pyapikey
 import pylogconf.core
-from github.Repository import Repository
 from pytconf import config_arg_parse_and_launch, register_endpoint, register_main
 from pytconf.pydoc import get_first_line
 from pytconf.registry import the_registry
@@ -22,6 +20,11 @@ import pygitpub.static
 from pygitpub.configs import AFFILIATIONS, ConfigAlgo, ConfigCleanup, ConfigGithub, ConfigOutput, ConfigRuns
 from pygitpub.utils.lua import config_path, load_lua_file
 from pygitpub.utils.misc import get_all_git_repos
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from github.Repository import Repository
 
 
 def get_base_dir() -> str:
