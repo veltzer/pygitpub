@@ -7,7 +7,7 @@ import os
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 import github
 import pyapikey
@@ -32,7 +32,14 @@ def get_base_dir() -> str:
     return os.path.expanduser(base_dir)
 
 
-def get_repo_folder(repo) -> str:
+class Named(Protocol):
+    """ What get_repo_folder needs of a repository. """
+
+    @property
+    def name(self) -> str: ...
+
+
+def get_repo_folder(repo: Named) -> str:
     return os.path.join(get_base_dir(), repo.name)
 
 
@@ -741,7 +748,7 @@ def config() -> None:
     app_name=pygitpub.static.APP_NAME,
     version=pygitpub.static.VERSION_STR,
 )
-def main():
+def main() -> None:
     pylogconf.core.setup()
     config_arg_parse_and_launch()
 

@@ -20,14 +20,14 @@ if TYPE_CHECKING:
 
 
 class LuaTests(unittest.TestCase):
-    def test_config_path(self):
+    def test_config_path(self) -> None:
         assert lua.config_path("project") == os.path.join("config", "project.lua")
 
-    def test_lua_to_python_scalar(self):
+    def test_lua_to_python_scalar(self) -> None:
         assert lua.lua_to_python(5) == 5
         assert lua.lua_to_python("hello") == "hello"
 
-    def test_load_lua_file_dict_and_list(self):
+    def test_load_lua_file_dict_and_list(self) -> None:
         source = 'NAME = "pygitpub"\nKEYWORDS = {"a", "b", "c"}\n'
         with tempfile.NamedTemporaryFile("w", suffix=".lua", delete=False, encoding="utf-8") as fh:
             fh.write(source)
@@ -39,7 +39,7 @@ class LuaTests(unittest.TestCase):
         finally:
             os.unlink(name)
 
-    def test_load_lua_file_nested_table(self):
+    def test_load_lua_file_nested_table(self) -> None:
         source = 'DATA = {x = 1, y = 2}\n'
         with tempfile.NamedTemporaryFile("w", suffix=".lua", delete=False, encoding="utf-8") as fh:
             fh.write(source)
@@ -50,13 +50,13 @@ class LuaTests(unittest.TestCase):
         finally:
             os.unlink(name)
 
-    def test_load_lua_file_missing_raises(self):
+    def test_load_lua_file_missing_raises(self) -> None:
         with pytest.raises(FileNotFoundError):
             lua.load_lua_file(os.path.join(tempfile.gettempdir(), "no_such_pygitpub_file.lua"))
 
 
 class MiscTests(unittest.TestCase):
-    def test_get_all_git_repos_finds_top_level_only(self):
+    def test_get_all_git_repos_finds_top_level_only(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             for repo in ("r1", "r2"):
                 os.makedirs(os.path.join(d, repo, ".git"))
@@ -68,25 +68,25 @@ class MiscTests(unittest.TestCase):
 
 class AffiliationTests(unittest.TestCase):
     @override
-    def tearDown(self):
+    def tearDown(self) -> None:
         ConfigAlgo.affiliation = "owner"
         ConfigAlgo.base_dir = "~/git"
 
-    def test_get_affiliation_normalizes_whitespace(self):
+    def test_get_affiliation_normalizes_whitespace(self) -> None:
         ConfigAlgo.affiliation = " owner , collaborator "
         assert main.get_affiliation() == "owner,collaborator"
 
-    def test_get_affiliation_rejects_bad_value(self):
+    def test_get_affiliation_rejects_bad_value(self) -> None:
         ConfigAlgo.affiliation = "owner,bogus"
         with pytest.raises(ValueError, match="bad affiliation"):
             main.get_affiliation()
 
-    def test_get_affiliation_rejects_empty(self):
+    def test_get_affiliation_rejects_empty(self) -> None:
         ConfigAlgo.affiliation = " , "
         with pytest.raises(ValueError, match="must not be empty"):
             main.get_affiliation()
 
-    def test_get_repo_folder_uses_expanded_base_dir(self):
+    def test_get_repo_folder_uses_expanded_base_dir(self) -> None:
         ConfigAlgo.base_dir = "~/somebase"
 
         class FakeRepo:
@@ -101,7 +101,7 @@ class GraphqlBadRunsTests(unittest.TestCase):
 
     STATES: ClassVar[dict[str, str | None]] = {"r3": "FAILURE", "r7": "PENDING", "r11": None}
 
-    def fake_graphql_query(self, query, variables) -> tuple[dict[str, str], dict[str, Any]]:
+    def fake_graphql_query(self, query: str, variables: dict[str, Any]) -> tuple[dict[str, str], dict[str, Any]]:
         if "checkSuites" in query:
             assert variables["name"] in ("r3", "r7")
             nodes = [
@@ -127,18 +127,18 @@ class GraphqlBadRunsTests(unittest.TestCase):
                 data[alias] = {"defaultBranchRef": {"target": {"statusCheckRollup": rollup}}}
         return {}, {"data": data}
 
-    def run_bad_runs(self, bad_state: Callable[[str], bool], bad_conclusion: Callable[[str], bool]):
+    def run_bad_runs(self, bad_state: Callable[[str], bool], bad_conclusion: Callable[[str], bool]) -> list[tuple[str, str, str, int]]:
         repos = [SimpleNamespace(full_name=f"me/r{i}") for i in range(12)]
         fake_github = SimpleNamespace(requester=SimpleNamespace(graphql_query=self.fake_graphql_query))
         with mock.patch.object(main, "get_github", return_value=fake_github), \
                 mock.patch.object(main, "yield_repos", return_value=repos):
             return main.graphql_bad_runs(bad_state, bad_conclusion)
 
-    def test_not_success(self):
+    def test_not_success(self) -> None:
         runs = self.run_bad_runs(lambda state: state != "SUCCESS", lambda conclusion: conclusion != "SUCCESS")
         assert runs == [("me/r3", "build", "failure", 2), ("me/r3", "pages", "in_progress", 3), ("me/r7", "build", "failure", 2), ("me/r7", "pages", "in_progress", 3)]
 
-    def test_failing(self):
+    def test_failing(self) -> None:
         runs = self.run_bad_runs(main.is_failing_state, main.is_failing_conclusion)
         assert runs == [("me/r3", "build", "failure", 2)]
 
@@ -160,47 +160,47 @@ def not_found() -> github.GithubException:
 class FakePagesRepo:
     """ a repo with the given files; pages is the /pages answer or None """
 
-    def __init__(self, files, pages=None):
+    def __init__(self, files: set[str], pages: dict[str, Any] | None = None) -> None:
         self.name = "r"
         self.url = "https://api.github.com/repos/me/r"
         self.files = files
         self.has_pages = pages is not None
         self.requester = SimpleNamespace(requestJsonAndCheck=mock.Mock(return_value=({}, pages)))
 
-    def get_contents(self, path):
+    def get_contents(self, path: str) -> SimpleNamespace:
         if path not in self.files:
             raise not_found()
         return SimpleNamespace(path=path)
 
 
-def legacy_pages(path="/docs"):
+def legacy_pages(path: str = "/docs"):
     return {"build_type": "legacy", "source": {"branch": "master", "path": path}}
 
 
 class PagesCheckTests(unittest.TestCase):
-    def test_site_without_pages(self):
+    def test_site_without_pages(self) -> None:
         repo = FakePagesRepo({"docs", "docs/index.html"})
         assert main.pages_check_repo(as_repo(repo)) == ["r: has a docs/index.html but no github pages"]
 
-    def test_notes_folder_without_pages_is_fine(self):
+    def test_notes_folder_without_pages_is_fine(self) -> None:
         assert main.pages_check_repo(as_repo(FakePagesRepo({"docs", "docs/TODO.txt"}))) == []
 
-    def test_workflow_pages_are_not_checked(self):
+    def test_workflow_pages_are_not_checked(self) -> None:
         repo = FakePagesRepo(set(), {"build_type": "workflow", "source": {"branch": "master", "path": "/"}})
         assert main.pages_check_repo(as_repo(repo)) == []
 
-    def test_branch_pages_not_from_docs(self):
+    def test_branch_pages_not_from_docs(self) -> None:
         repo = FakePagesRepo({"docs"}, legacy_pages("/"))
         assert main.pages_check_repo(as_repo(repo)) == ["r: github pages served from [master:/] and not from docs"]
 
-    def test_branch_pages_from_missing_docs(self):
+    def test_branch_pages_from_missing_docs(self) -> None:
         repo = FakePagesRepo(set(), legacy_pages())
         assert main.pages_check_repo(as_repo(repo)) == ["r: github pages served from docs but there is no docs folder"]
 
-    def test_asset_site_without_index_is_fine(self):
+    def test_asset_site_without_index_is_fine(self) -> None:
         assert main.pages_check_repo(as_repo(FakePagesRepo({"docs"}, legacy_pages()))) == []
 
-    def test_other_errors_are_raised(self):
+    def test_other_errors_are_raised(self) -> None:
         repo = FakePagesRepo(set())
         failing = mock.patch.object(repo, "get_contents", side_effect=github.GithubException(500, {}))
         with failing, pytest.raises(github.GithubException):
@@ -209,10 +209,10 @@ class PagesCheckTests(unittest.TestCase):
 
 class WorkflowsRunTests(unittest.TestCase):
     @override
-    def tearDown(self):
+    def tearDown(self) -> None:
         ConfigAlgo.dryrun = False
 
-    def make_repo(self):
+    def make_repo(self) -> SimpleNamespace:
         self.done = mock.Mock(status="completed")
         self.running = mock.Mock(status="in_progress")
         # SimpleNamespace, since Mock(name=...) names the mock instead of
@@ -224,7 +224,7 @@ class WorkflowsRunTests(unittest.TestCase):
         ]
         return SimpleNamespace(name="r", default_branch="main", get_workflows=lambda: self.workflows)
 
-    def test_reruns_last_finished_run_on_default_branch(self):
+    def test_reruns_last_finished_run_on_default_branch(self) -> None:
         lines = main.workflows_run_repo(as_repo(self.make_repo()))
         assert lines == ["r: rerunning build", "r: pages is in_progress, not rerunning"]
         self.done.rerun.assert_called_once_with()
@@ -232,13 +232,13 @@ class WorkflowsRunTests(unittest.TestCase):
         for workflow in self.workflows:
             workflow.get_runs.assert_called_once_with(branch="main")
 
-    def test_dryrun_does_not_rerun(self):
+    def test_dryrun_does_not_rerun(self) -> None:
         ConfigAlgo.dryrun = True
         lines = main.workflows_run_repo(as_repo(self.make_repo()))
         assert "r: rerunning build" in lines
         self.done.rerun.assert_not_called()
 
-    def test_rerun_failure_is_reported(self):
+    def test_rerun_failure_is_reported(self) -> None:
         repo = self.make_repo()
         self.done.rerun.side_effect = github.GithubException(403, {"message": "nope"})
         assert main.workflows_run_repo(as_repo(repo))[1].startswith("Failed to rerun:")
@@ -246,10 +246,10 @@ class WorkflowsRunTests(unittest.TestCase):
 
 class YieldReposTests(unittest.TestCase):
     @override
-    def tearDown(self):
+    def tearDown(self) -> None:
         ConfigAlgo.repos = []
 
-    def fake_github(self, names):
+    def fake_github(self, names: list[str]) -> SimpleNamespace:
         repos = [
             SimpleNamespace(name=name, fork=False, private=False, owner=SimpleNamespace(login="me"))
             for name in names
@@ -257,11 +257,11 @@ class YieldReposTests(unittest.TestCase):
         user = SimpleNamespace(get_repos=mock.Mock(return_value=repos))
         return SimpleNamespace(get_user=lambda: user)
 
-    def test_all_repos_by_default(self):
+    def test_all_repos_by_default(self) -> None:
         found = [repo.name for repo in main.yield_repos(as_github(self.fake_github(["a", "b"])))]
         assert found == ["a", "b"]
 
-    def test_repos_selects_and_reports_unknown_names(self):
+    def test_repos_selects_and_reports_unknown_names(self) -> None:
         ConfigAlgo.repos = ["b", "zz"]
         with mock.patch("sys.stderr") as stderr:
             found = [repo.name for repo in main.yield_repos(as_github(self.fake_github(["a", "b"])))]
