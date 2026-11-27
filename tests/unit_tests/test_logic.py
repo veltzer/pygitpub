@@ -198,8 +198,8 @@ class PagesCheckTests(unittest.TestCase):
 
     def test_other_errors_are_raised(self):
         repo = FakePagesRepo(set())
-        repo.get_contents = mock.Mock(side_effect=github.GithubException(500, {}))
-        with pytest.raises(github.GithubException):
+        failing = mock.patch.object(repo, "get_contents", side_effect=github.GithubException(500, {}))
+        with failing, pytest.raises(github.GithubException):
             main.pages_check_repo(as_repo(repo))
 
 
