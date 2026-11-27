@@ -98,7 +98,7 @@ class GraphqlBadRunsTests(unittest.TestCase):
 
     STATES: ClassVar[dict[str, str | None]] = {"r3": "FAILURE", "r7": "PENDING", "r11": None}
 
-    def fake_graphql_query(self, query, variables):
+    def fake_graphql_query(self, query, variables) -> tuple[dict[str, str], dict[str, Any]]:
         if "checkSuites" in query:
             assert variables["name"] in ("r3", "r7")
             nodes = [
