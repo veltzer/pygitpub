@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 from types import SimpleNamespace
-from typing import Any, ClassVar, cast
+from typing import Any, ClassVar, cast, override
 from unittest import mock
 
 import github
@@ -64,6 +64,7 @@ class MiscTests(unittest.TestCase):
 
 
 class AffiliationTests(unittest.TestCase):
+    @override
     def tearDown(self):
         ConfigAlgo.affiliation = "owner"
         ConfigAlgo.base_dir = "~/git"
@@ -204,6 +205,7 @@ class PagesCheckTests(unittest.TestCase):
 
 
 class WorkflowsRunTests(unittest.TestCase):
+    @override
     def tearDown(self):
         ConfigAlgo.dryrun = False
 
@@ -240,6 +242,7 @@ class WorkflowsRunTests(unittest.TestCase):
 
 
 class YieldReposTests(unittest.TestCase):
+    @override
     def tearDown(self):
         ConfigAlgo.repos = []
 
