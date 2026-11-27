@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 from types import SimpleNamespace
-from typing import Any, ClassVar, cast, override
+from typing import TYPE_CHECKING, Any, ClassVar, cast, override
 from unittest import mock
 
 import github
@@ -14,6 +14,9 @@ import pytest
 from pygitpub import main
 from pygitpub.configs import ConfigAlgo
 from pygitpub.utils import lua, misc
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class LuaTests(unittest.TestCase):
@@ -124,7 +127,7 @@ class GraphqlBadRunsTests(unittest.TestCase):
                 data[alias] = {"defaultBranchRef": {"target": {"statusCheckRollup": rollup}}}
         return {}, {"data": data}
 
-    def run_bad_runs(self, bad_state, bad_conclusion):
+    def run_bad_runs(self, bad_state: Callable[[str], bool], bad_conclusion: Callable[[str], bool]):
         repos = [SimpleNamespace(full_name=f"me/r{i}") for i in range(12)]
         fake_github = SimpleNamespace(requester=SimpleNamespace(graphql_query=self.fake_graphql_query))
         with mock.patch.object(main, "get_github", return_value=fake_github), \
@@ -162,7 +165,7 @@ class FakePagesRepo:
         self.url = "https://api.github.com/repos/me/r"
         self.files = files
         self.has_pages = pages is not None
-        self.requester = SimpleNamespace(requestJsonAndCheck=lambda *_args: ({}, pages))
+        self.requester = SimpleNamespace(requestJsonAndCheck=mock.Mock(return_value=({}, pages)))
 
     def get_contents(self, path):
         if path not in self.files:
@@ -251,7 +254,7 @@ class YieldReposTests(unittest.TestCase):
             SimpleNamespace(name=name, fork=False, private=False, owner=SimpleNamespace(login="me"))
             for name in names
         ]
-        user = SimpleNamespace(get_repos=lambda **_kwargs: repos)
+        user = SimpleNamespace(get_repos=mock.Mock(return_value=repos))
         return SimpleNamespace(get_user=lambda: user)
 
     def test_all_repos_by_default(self):
